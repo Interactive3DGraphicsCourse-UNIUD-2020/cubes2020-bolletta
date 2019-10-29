@@ -1,7 +1,9 @@
 #Log lavoro:
+
 	- 28/10/19:
 		Progettazione idea simil populous
 		Studio funzionamento HeightMap, implementazione
+		
 	- 29/10/19:
 		Implementazione del "crop" nel terreno del mondo
 			- initiateTerrain()  :  inizializza la mappa
