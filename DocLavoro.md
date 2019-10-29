@@ -12,3 +12,7 @@
 		uso della camera ortogonale 
 		resize del renderer con resize schermo
 		
+		La mappa si muove al premere dei btn WASD sino al bordo
+		
+		
+		
