@@ -17,5 +17,15 @@
 	- 30/10/19:
 		Implemetazione shader material sabbia
 			con luccichio e ombra posizionale non trasmessa
+	
+	- 31/10/19
+		Implemetazione shader material erba
+			con ombra posizionale non trasmessa e movimento
+		Implemetazione shader material acqua
+			con luccichio e movimento
+		Implemetazione shader material neve
+			con luccichio e ombra posizionale non trasmessa
 		
+	
+	
 		
