@@ -16,6 +16,59 @@
 		}
 	
 	</style>
+		<script id="fragmentSand" type="x-shader/x-fragment">
+			
+			uniform sampler2D tex;
+			uniform float delta;
+			uniform vec3 lightPos;
+
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			
+			vec3 light; 
+				
+			float random (vec2 st) {
+				return fract(sin(dot(st.xy,
+									 vec2(12.9898,78.233)))*
+					43758.5453123);
+			}
+			
+
+			void main() {
+				light =   vec3(0.9, 0.9, 0.6);
+				vec4 color = texture2D(tex, vUv);
+				vec2 st = vUv.xy;
+				
+
+				st *= 40.0; // Scale the coordinate system by 10
+				vec2 ipos = floor(st);  // get the integer coords
+				vec2 fpos = fract(st);  // get the fractional coords
+				vec4 rand = vec4(random( ipos ));
+				vec4 randV= vec4(random(floor( gl_FragCoord.xy*0.8+vec2(delta))));
+				
+				float shade_factor = 0.19 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)));
+				
+				color = color*shade_factor;
+				
+				
+				if(randV.x>0.95 && rand.x>0.9)
+					gl_FragColor = vec4(1.0,1.0,0.9,1.0);
+				else
+					gl_FragColor = color;
+				
+			}
+			
+		</script>
+		<script id="vertexSand" type="x-shader/x-vertex">
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			
+			void main() {
+				vUv = uv;
+				vNormal = normal.xyz;
+				gl_Position =   projectionMatrix * modelViewMatrix *vec4(position,1.0);
+			}
+		</script>
 		<script src="lib/three.min.js"></script>
 		<script src="lib/stats.min.js"></script>
 		<script src="lib/Coordinates.js"></script>
@@ -25,9 +78,22 @@
 		
 		<script>
 		
-		var scene, renderer, controls, stats, camera, data, sun;
-		var gX=5, gZ=5;
-		var vista = 5,x = 0;
+		var scene, renderer, stats, camera, data, sun;
+		var gX = 5, gZ = 5;
+		var vista = 5, x = 0;
+		
+		var geometry 		= new THREE.BoxGeometry(1,1,1);
+		var material 		= new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
+		var materialSand 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/sand.jpg")}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexSand").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
+		//var materialGrass 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grass.jpg")}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML});
+		var cube,cropWorld;
+		
+		var clWS=true, clAD=true;
+		
+		
+		function i(id){
+			return document.getElementById(id);
+		}
 		
 		function getHeightData(img,scale) {
   
@@ -73,9 +139,7 @@
 		}
 		
 		
-		var geometry = new THREE.BoxGeometry(1,1,1);
-		var material = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
-		var cube,cropWorld;
+		
 		
 		function updateTerrainVis(){
 			
@@ -92,14 +156,20 @@
 							if(ix-1>iniX && ix+1<maxX && iz-1>iniZ && iz+1<maxZ){
 								if(data[ix+iz*sqrt]+1>data[(ix+1)+iz*sqrt] && data[ix+iz*sqrt]+1>data[(ix-1)+iz*sqrt] && data[ix+iz*sqrt]+1>data[(ix)+(iz+1)*sqrt] && data[ix+iz*sqrt]+1>data[(ix)+(iz-1)*sqrt])
 								{
-									cube = new THREE.Mesh(geometry, material);
+									if(data[ix+iz*sqrt]<=3)
+										cube = new THREE.Mesh(geometry, materialSand);
+									else
+										cube = new THREE.Mesh( geometry, material );
 									cube.position.set(ix-gX-vista, i2, iz-gZ-vista);
 									cube.castShadow = true;
 									cube.receiveShadow = true;
 									cropWorld.add(cube);
 								}
 							}else{
-								cube = new THREE.Mesh(geometry, material);
+								if(data[ix+iz*sqrt]<=3)
+									cube = new THREE.Mesh(geometry, materialSand);
+								else
+									cube = new THREE.Mesh( geometry, material );
 								cube.position.set(ix-gX-vista, i2, iz-gZ-vista);
 								cube.castShadow = true;
 								cube.receiveShadow = true;
@@ -142,7 +212,7 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			document.body.appendChild( stats.domElement );
-			
+			/*
 			sun.castShadow = true;
 			sun.shadowCameraVisible = true;		
 			sun.shadowMapWidth  = 512*2;
@@ -154,6 +224,7 @@
 			sun.shadow.camera.right  = d;
 			sun.shadow.camera.top    = d;
 			sun.shadow.camera.bottom = -d;			
+			*/
 			scene.add(sun);
 			
 					
@@ -173,16 +244,25 @@
 			requestAnimationFrame( Update ); 
 			stats.update();
 			
-			sun.position.set(Math.cos(x)*(vista*20), Math.sin(x)*(vista*20), -Math.cos(x)*(vista*20));
-			sun.color.r = ((Math.sin(x)*0.9))%1;
-			sun.color.g = ((Math.sin(x)*0.9))%1;
-			sun.color.b = ((Math.sin(x)*0.6))%1;
+			sunUpdate();
+			shaderUpdate();
 			
 			Render();
-			if(Math.sin(x)>=0)
-				x+=0.005;
-			else
-				x=0;
+			x=Date.now()/10000%Math.PI;
+		}
+		
+		function sunUpdate(){
+			
+			sun.position.set(Math.cos(x)*(vista*20), Math.abs(Math.sin(x)*(vista*20)), -Math.cos(x)*(vista*20));
+			sun.color.r = (Math.abs((Math.sin(x))*0.9))%1;
+			sun.color.g = (Math.abs((Math.sin(x))*0.9))%1;
+			sun.color.b = (Math.abs((Math.sin(x))*0.6))%1;
+			
+		}
+		
+		function shaderUpdate(){
+			materialSand.uniforms.delta.value = Math.sin(x*25);
+			materialSand.uniforms.lightPos.value = sun.position;
 		}
 		
 		function Render() {
@@ -210,7 +290,6 @@
 
 		}
 		
-		var clWS=true, clAD=true;
 
 		document.addEventListener("keydown", onDocumentKeyDown, false);
 		document.addEventListener("keyup", function(e){ 
