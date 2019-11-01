@@ -16,6 +16,39 @@
 		}
 	
 	</style>
+		<script id="fragmentButton" type="glsl/x-fragment">
+			
+			uniform sampler2D tex;
+			uniform float alpha;
+			varying vec2 vUv;
+			varying vec3 vPosition;
+			varying vec3 vNormal;
+				
+			
+
+			void main() {
+				vec2 uVu  = vUv;
+				float shaderFactor = dot(vNormal, vec3(0.255, 0.67, 0.8));
+				float med = 0.5;
+				uVu = vec2(
+					cos(alpha) * (uVu.x - med) + sin(alpha) * (uVu.y - med) + med,
+					cos(alpha) * (uVu.y - med) - sin(alpha) * (uVu.x - med) + med
+				);
+				
+				vec4 color = texture2D(tex, uVu);
+				vec4 colorBase = vec4(vec3(1.0)*shaderFactor,1.0);
+				
+				
+				if(vPosition.y>0.499)
+					if(color.a>0.5)
+						gl_FragColor = color;
+					else 
+						gl_FragColor = colorBase;
+				else 
+					gl_FragColor = colorBase;
+			}
+			
+		</script>
 		<script id="fragmentSnow" type="glsl/x-fragment">
 			
 			uniform sampler2D tex;
@@ -52,7 +85,7 @@
 				
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
-					gl_FragColor = 1.15*shade_factor*vec4(1.,1.,1.,1.0)*(sin(delta)+0.5);
+					gl_FragColor = 1.15*shade_factor*vec4(1.,1.,1.,1.0)*max(0.85,(sin(delta)+0.5));
 				else
 					gl_FragColor = vec4(vec3(dot(color.rgb, vec3(0.299, 0.587, 0.114)))*1.35,1.0);
 				
@@ -95,7 +128,7 @@
 				
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
-					gl_FragColor = 1.15*shade_factor*vec4(1.0,0.75,0.1,1.0)*(sin(delta)+0.5);
+					gl_FragColor = 1.15*shade_factor*vec4(1.0,0.75,0.1,1.0)*max(0.85,(sin(delta)+0.5));
 				else
 					gl_FragColor = color;
 				
@@ -142,44 +175,72 @@
 		<script id="fragmentGrass" type="glsl/x-fragment">
 			
 			uniform sampler2D tex;
+			uniform sampler2D texLato;
 			uniform float delta;
 			uniform vec3 lightPos;
 
 			varying vec2 vUv;
 			varying vec3 vNormal;
+			varying vec3 vPosition;
 			
 			vec3 light; 
 			
 			
 
 			void main() {
-				vec2 uVu = vUv+vec2(pow(2.72,sin(delta*50.5)/8.0)/15.5*sin(delta*10.0), pow(2.72,sin(delta*10.5)/8.0)/15.5);
-				
-				light =   vec3(0.2, 0.9, 0.05);
-				
-				vec4 color = texture2D(tex, uVu);
 				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
-				color = color*shade_factor*max(min((sin(delta)/1.15),0.4), 0.85);
+				vec4 color;
 				
-				gl_FragColor = vec4(color.xyz*light,1.0);
+				light =   vec3(0.2, 0.8, 0.05);
+								
 				
+				if(vPosition.y>0.45){
+					vec2 uVu = vUv+vec2(pow(2.72,sin(delta*50.5)/4.0)/3.5*sin(delta*10.0), pow(2.72,sin(delta*10.5)/4.0)/3.0);
+					color = texture2D(tex, uVu);
+					
+					color = color*shade_factor*max(min((sin(delta)/1.15),0.4), 0.85);
+				
+					gl_FragColor = vec4(color.xyz*light,1.0);
+				}else{
+					color = texture2D(texLato, vUv);
+					
+					color = color*shade_factor*max(min((sin(delta)/1.15),0.4), 0.85);
+				
+					gl_FragColor = vec4(color.xyz,1.0);
+				}
 			}
 			
 		</script>
-		
-		<script id="vertex" type="glsl/x-vertex">
+		<script id="vertexGrass" type="glsl/x-vertex">
 			uniform sampler2D tex;
 			varying vec2 vUv;
 			varying vec3 vNormal;
+			varying vec3 vPosition;
 			
 			void main() {
 				vUv = uv;
 				vNormal = normal.xyz;
-				
+				vPosition = position.xyz;
 				
 				gl_Position =   projectionMatrix * modelViewMatrix *vec4(position,1.0);
 			}
 		</script>
+		<script id="vertex" type="glsl/x-vertex">
+			
+			uniform sampler2D tex;
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			
+			void main() {
+				vUv = uv;
+				vNormal = normal.xyz;
+				vPosition = position;
+				
+				gl_Position =   projectionMatrix * modelViewMatrix *vec4(position,1.0);
+			}
+		</script>
+		
 		<script src="lib/three.min.js"></script>
 		<script src="lib/stats.min.js"></script>
 		<script src="lib/Coordinates.js"></script>
@@ -190,22 +251,31 @@
 		<script>
 		
 		var scene, renderer, stats, camera, data, sun;
-		var gX = 5, gZ = 5;
-		var vista = 5, x = 0;
+		var gX 	  = 5, gZ = 5;
+		var vista = 5, x  = 0;
 		
 		var geometry 		= new THREE.BoxGeometry(1,1,1);
 		var material 		= new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
-		var materialSand 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/sand.jpg")}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
-		var materialSnow 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/sand.jpg")}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
-		var materialWater 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/sand.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
-		var materialGrass 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/sand.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
+		var texture			= new THREE.ImageUtils.loadTexture("textures/sand.jpg");
+		var materialSand 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
+		var materialSnow 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
+		var materialWater 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
+		var materialGrass 	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture},texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
 			materialGrass.uniforms.tex.value.wrapS  = THREE.RepeatWrapping;
 			materialGrass.uniforms.tex.value.wrapT  = THREE.RepeatWrapping;
+		var materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
 			
 		var cube,cropWorld;
+		var touchableItem;
 		
 		var clWS=true, clAD=true;
 		
+		var raycaster    = new THREE.Raycaster();
+		var mousePos     = new THREE.Vector2();
+		var mousePressed = false;
+		
+		
+		var command	 = { terrainUp: true, terrainDown:false, fire:false};
 		
 		function i(id){
 			return document.getElementById(id);
@@ -265,6 +335,17 @@
 				return new THREE.Mesh( geometry, material );
 		}
 		
+		function modifyTerrainHigh(position,value){
+			var sqrt = Math.sqrt(data.length);
+			console.log(position);
+			console.log(data[position.x+position.z*sqrt]);
+			if(position.x>=0 && position.x<sqrt &&	
+				position.z>=0 && position.z<sqrt){
+					data[position.x+position.z*sqrt]+=value;
+					updateTerrainVis();
+				}
+		}
+		
 		function updateTerrainVis(){
 			
 			cube = new THREE.Mesh( geometry, material );
@@ -277,23 +358,13 @@
 				for(var ix=iniX; ix<maxX; ix++){
 					for(var iz=iniZ; iz<maxZ; iz++){
 						for(var i2=0; i2<data[ix+iz*sqrt]; i2++){	
-							if(ix-1>iniX && ix+1<maxX && iz-1>iniZ && iz+1<maxZ){
-								if(data[ix+iz*sqrt]+1>data[(ix+1)+iz*sqrt] && data[ix+iz*sqrt]+1>data[(ix-1)+iz*sqrt] && data[ix+iz*sqrt]+1>data[(ix)+(iz+1)*sqrt] && data[ix+iz*sqrt]+1>data[(ix)+(iz-1)*sqrt])
-								{
-									cube = materiale(i2);
-									cube.position.set(ix-gX-vista, i2, iz-gZ-vista);
-									cube.castShadow = true;
-									cube.receiveShadow = true;
-									cropWorld.add(cube);
-								}
-							}else{
 								cube = materiale(i2);
 								
 								cube.position.set(ix-gX-vista, i2, iz-gZ-vista);
 								cube.castShadow = true;
 								cube.receiveShadow = true;
 								cropWorld.add(cube);
-							}
+							
 							
 						}
 					}
@@ -313,7 +384,7 @@
 			scene.add(new THREE.Object3D());
 			initiateTerrain();
 			
-			
+			touchableItem = new THREE.Object3D();
 
 			renderer = new THREE.WebGLRenderer( {antialias: true} );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -354,6 +425,34 @@
 			sea.rotation.set(-Math.PI/2, 0, 0);
 			sea.position.set(-vista-0.6, 2, -vista-0.6);
 			scene.add(sea);
+			
+			var button = [];			
+			
+			for(var idx=0; idx<9; idx++){
+				if(idx==4)
+					materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:idx*Math.PI/8}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+				else{
+					materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:idx*Math.PI/8}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+				}
+				button.push(new THREE.Mesh(new THREE.CubeGeometry(1), materialButton));
+				
+				button[idx].position.set(parseInt(idx/3),0,parseInt(idx%3));
+				button[idx].scale.set(1,1,1);
+				
+				touchableItem.add(button[idx]);
+			}
+			
+			button[0].material.uniforms.alpha.value = 2*Math.PI/8;
+			button[1].material.uniforms.alpha.value = 4*Math.PI/8;
+			button[2].material.uniforms.alpha.value = 6*Math.PI/8;
+			button[3].material.uniforms.alpha.value = 0;
+			button[5].material.uniforms.alpha.value = 8*Math.PI/8;
+			button[6].material.uniforms.alpha.value = -2*Math.PI/8;
+			button[7].material.uniforms.alpha.value = -4*Math.PI/8;
+			button[8].material.uniforms.alpha.value = -6*Math.PI/8;
+				
+			scene.add(touchableItem);
+			touchableItem.position.set(-8,0,2);
 			
 			onWindowResize();
 			
@@ -396,6 +495,61 @@
 		}
 		
 		
+		function action(action){
+			var offset = new THREE.Vector3(gX+vista, 0, gZ+vista);
+			console.log(action.position.add(offset));
+			if(command.terrainUp){
+				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), +1);
+			}else if(command.terrainDown){
+				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), -1);
+			}
+			
+		}
+		
+		function buttonAction(action){
+			if(action.position.x==0 && action.position.z==2){
+				gX--; gZ++;
+			}else if(action.position.x==0 && action.position.z==1){
+				gX--;
+			}else if(action.position.x==0 && action.position.z==0){
+				gX--; gZ--;
+			}else if(action.position.x==1 && action.position.z==2){
+				gZ++;
+			}else if(action.position.x==1 && action.position.z==0){
+				gZ--; 
+			}else if(action.position.x==2 && action.position.z==2){
+				gX++; gZ++;
+			}else if(action.position.x==2 && action.position.z==1){
+				gX++;
+			}else if(action.position.x==2 && action.position.z==0){
+				gX++; gZ--;
+			}
+			
+			buttonAnimation(action);
+			
+			gX=lim(gX, vista, Math.sqrt(data.length)-vista);
+			gZ=lim(gZ, vista, Math.sqrt(data.length)-vista);
+			updateTerrainVis();
+			
+			
+			
+		}
+		
+		
+		function buttonAnimation(btn){
+			btn.position.y = -0.2;
+			var intervallo = setInterval(function(){
+				if(btn.position.y>=0)
+				{
+					clearInterval(intervallo);
+					btn.position.y=0;
+				}else 
+					btn.position.y+=0.075;
+			},100);
+		}
+		
+		
+		
 		
 		window.addEventListener( 'resize', onWindowResize, false );
 		document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -403,6 +557,9 @@
 												if(e.which==83 || e.which==87) clWS=true;
 												if(e.which==68 || e.which==65) clAD=true;
 											}, false);
+		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		document.addEventListener( 'mousedown', onDocumentMouseDown, false );    
+		document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 		function onWindowResize(){
 			
@@ -440,6 +597,57 @@
 				gZ=lim(gZ, vista, Math.sqrt(data.length)-vista);
 				updateTerrainVis();
 			}		
+		function onDocumentMouseDown( event ) { 
+			mousePressed=true;
+			
+			raycaster.setFromCamera( mousePos.clone(), camera );   
+			
+			var objects = raycaster.intersectObjects(cropWorld.children);
+			var o = [];
+			if (objects.length>0) {
+				for (var i=0; i<objects.length; i++) {
+				   	o.push(objects[i].object.uuid);
+					
+				}
+				o = o.length>0 ? o[0] : -1;
+			} else {
+				objects = raycaster.intersectObjects(touchableItem.children);
+				o = [];
+				if (objects.length>0) {
+					for (var i=0; i<objects.length; i++) {
+						o.push(objects[i].object.uuid);
+						
+					}
+					o = o.length>0 ? o[0] : -1;
+				} 
+				else
+					o = o.length>0 ? o[0] : -1;
+			} 
+			
+			
+			if(mousePressed){
+				for(var i=0; i<cropWorld.children.length; i++) {
+							
+							if (cropWorld.children[i].uuid===o) {
+								action(cropWorld.children[i].clone());
+								mousePressed = false;
+							} 
+					}
+				for(var i=0; i<touchableItem.children.length; i++) {
+							
+							if (touchableItem.children[i].uuid===o) {
+								buttonAction(touchableItem.children[i]);
+								mousePressed = false;
+							} 
+					}
+			}
+		}
+		function onDocumentMouseUp( event ) { mousePressed = false;}
+		function onDocumentMouseMove( event ) {
+			mousePos.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mousePos.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		}
+
 		
 		function lim(val, min, max){
 			return Math.min(max, Math.max(val, min));

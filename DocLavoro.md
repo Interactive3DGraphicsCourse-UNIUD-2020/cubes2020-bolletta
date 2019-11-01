@@ -25,7 +25,10 @@
 			con luccichio e movimento
 		Implemetazione shader material neve
 			con luccichio e ombra posizionale non trasmessa
-		
+	
+	- 1/10/19
+		Aggiunta bottoni comando x posizione
+		Aggiunta funzione per alzare o abassare il terreno, (no btn)
 	
 	
 		
