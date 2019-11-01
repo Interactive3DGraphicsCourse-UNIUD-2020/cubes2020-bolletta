@@ -28,7 +28,7 @@
 	
 	- 1/10/19
 		Aggiunta bottoni comando x posizione
-		Aggiunta funzione per alzare o abassare il terreno, (no btn)
+		Aggiunta funzione per alzare o abassare il terreno,+ btn x controllarlo
 	
 	
 		

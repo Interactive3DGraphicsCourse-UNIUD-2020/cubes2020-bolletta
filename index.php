@@ -374,7 +374,7 @@
 		}
 	
 		
-		function Start() {
+		function Start() {			
 			sun = new THREE.DirectionalLight(0xddddff, 1.5);
 			var ambient =  new THREE.DirectionalLight(0xffffaa, 0.5);
 			
@@ -382,6 +382,9 @@
 			camera = new THREE.OrthographicCamera(-window.innerWidth/64, window.innerWidth/64, window.innerHeight/44, -window.innerHeight/44, 1, 100);
 			
 			scene.add(new THREE.Object3D());
+			
+			
+			resetCommand();
 			initiateTerrain();
 			
 			touchableItem = new THREE.Object3D();
@@ -416,8 +419,6 @@
 			sun.shadow.camera.bottom = -d;			
 			*/
 			scene.add(sun);
-			
-					
 			scene.add(ambient);
 			
 			
@@ -428,12 +429,24 @@
 			
 			var button = [];			
 			
-			for(var idx=0; idx<9; idx++){
-				if(idx==4)
-					materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:idx*Math.PI/8}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
-				else{
-					materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:idx*Math.PI/8}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+			for(var idx=0; idx<12; idx++){
+				switch(idx){
+					case 4:
+						materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/punto.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+						break;
+					case 10:
+						materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/punto.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+						break;
+					case 9:
+						materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/alza.png")}, alpha: {type:"f", value:Math.PI/4}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+						break;
+					case 11:
+						materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bassa.png")}, alpha: {type:"f", value:Math.PI/4}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+						break;
+					default:
+						materialButton	= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:idx*Math.PI/8}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
 				}
+				
 				button.push(new THREE.Mesh(new THREE.CubeGeometry(1), materialButton));
 				
 				button[idx].position.set(parseInt(idx/3),0,parseInt(idx%3));
@@ -506,6 +519,20 @@
 			
 		}
 		
+		
+		function resetAllBTN(){
+			
+			for(var i=0; i<touchableItem.children.length; i++){
+				touchableItem.children[i].position.y=0;
+			}
+		}
+		
+		function resetCommand(){
+			command.terrainUp	= false;
+			command.terrainDown	= false;
+			command.fire		= false;
+		}
+		
 		function buttonAction(action){
 			if(action.position.x==0 && action.position.z==2){
 				gX--; gZ++;
@@ -525,7 +552,25 @@
 				gX++; gZ--;
 			}
 			
-			buttonAnimation(action);
+			if(!((action.position.z==1 && action.position.x==1) ||
+				action.position.x==3)){
+				console.log(action.position);
+				buttonAnimation(action);
+				
+			}
+			else{
+				if(action.position.x==3){
+					resetAllBTN();
+					resetCommand();
+					if(action.position.z==0){
+						command.terrainUp = true;
+						action.position.y=-0.3;
+					}else if(action.position.z==2){
+						command.terrainDown = true;
+						action.position.y=-0.3;
+					}
+				}
+			}
 			
 			gX=lim(gX, vista, Math.sqrt(data.length)-vista);
 			gZ=lim(gZ, vista, Math.sqrt(data.length)-vista);
