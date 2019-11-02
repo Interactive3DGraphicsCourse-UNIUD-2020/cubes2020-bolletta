@@ -143,7 +143,7 @@
 			}
 			
 		</script>
-			<script id="fragmentBadRock" type="glsl/x-fragment">
+		<script id="fragmentBadRock" type="glsl/x-fragment">
 			
 			uniform sampler2D tex;
 			uniform float delta;
@@ -200,7 +200,8 @@
 
 				vec2 st = vUv.xy+vec2(delta,0.0);
 				
-								
+				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
+							
 				st *= 80.0; 			
 				vec2 ipos = floor(st);  
 				vec2 fpos = fract(st);  // get the fractional coords
@@ -272,7 +273,8 @@
 		<script id="vertexWater" type="glsl/x-vertex">
 			
 			uniform sampler2D tex;
-			uniform float WavePosX;
+			uniform float delta;
+			uniform float waveX;
 			varying vec2 vUv;
 			varying vec3 vNormal;
 			varying vec3 vPosition;
@@ -282,13 +284,11 @@
 				vNormal = normal.xyz;
 				vPosition = position.xyz;
 				
-				
-				if(position.x>=WavePosX-0.2 && position.x<WavePosX+0.3){
-					gl_Position =   projectionMatrix * modelViewMatrix *(vec4(position,1.0)+vec4(-1.,0.75,0.0,0.));
-					vPosition = gl_Position.xyz;
-				}
+				if(waveX!=0. && position.y>-5.5 && position.y<5. && position.x>-5. && position.x<5.5)
+					gl_Position =   projectionMatrix * modelViewMatrix *(vec4(position,1.0)+(vec4(0.,0.,(waveX*cos(position.x+delta*10.)*sin(position.y)/2.)+waveX,0.)));
 				else
 					gl_Position =   projectionMatrix * modelViewMatrix *(vec4(position,1.0));
+				
 			
 				
 			}
@@ -330,8 +330,8 @@
 		var materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
 		var materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
 		var materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
-		var materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, WavePosX : {type:"f", value:0.0}, lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
-		var materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture},texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
+		var materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
+		var materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
 			materialGrass.uniforms.tex.value.wrapS  = THREE.RepeatWrapping;
 			materialGrass.uniforms.tex.value.wrapT  = THREE.RepeatWrapping;
 		var materialButton			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
@@ -363,7 +363,7 @@
 		    var context = canvas.getContext( '2d' );
  
 		    var size = img.width * img.height;
-			console.log(size);
+			console.log("World size: "+size);
 		    var data = new Float32Array( size );
  
 		    context.drawImage(img,0,0);
@@ -479,8 +479,7 @@
 						updateTerrainVis();
 					}
 		}
-		
-		
+	
 		function updateTerrainVis(){
 			
 			cube = new THREE.Mesh( geometry, material );
@@ -505,7 +504,7 @@
 					}
 				}
 			}
-			cropWorld.position.set(-vista, 0,- vista);
+			cropWorld.position.set(-vista-0.5, 0,- vista-0.5);
 			cropWorld.rotation.y = rotateA;
 			scene.children[1].rotation.z=rotateA;
 			scene.children[0]=(cropWorld);
@@ -517,7 +516,7 @@
 			var ambient =  new THREE.DirectionalLight(0xffffaa, 0.5);
 			
 			scene = new THREE.Scene();
-			camera = new THREE.OrthographicCamera(-window.innerWidth/64*zoom, window.innerWidth/64*zoom, window.innerHeight/44*zoom, -window.innerHeight/44*zoom, 1, 100);
+			camera = new THREE.OrthographicCamera(-window.innerWidth/64*zoom, window.innerWidth/64*zoom, window.innerHeight/44*zoom, -window.innerHeight/44*zoom, 0.01, 400);
 			
 			scene.add(new THREE.Object3D());
 			scene.add(new THREE.Object3D());
@@ -560,7 +559,7 @@
 			scene.add(ambient);
 			
 			
-			var sea = new THREE.Mesh(new THREE.PlaneGeometry(vista*2+2,vista*2+2,100), materialWater);
+			var sea = new THREE.Mesh(new THREE.PlaneGeometry(vista*2+2,vista*2+2,320,320), materialWater);
 			sea.rotation.set(-Math.PI/2, 0, 0);
 			sea.position.set(-vista-0.6, 2.4, -vista-0.6);
 			scene.children[1]=(sea);
@@ -603,7 +602,7 @@
 			materialWater.uniforms.delta.value = x;
 			materialGrass.uniforms.delta.value = x;
 			materialSnow.uniforms.delta.value = x;
-			materialWater.uniforms.WavePosX.value = waveX;
+			materialWater.uniforms.delta.value = x;
 			
 			materialSand.uniforms.lightPos.value = sun.position;
 			materialGrass.uniforms.lightPos.value = sun.position;
@@ -617,17 +616,18 @@
 		}
 		
 		
-		function action(action){
+		function actionFunction(action){
 			var offset = new THREE.Vector3(gX+vista, 0, gZ+vista);
-			console.log(action.position.add(offset));
 			if(command.terrainUp){
 				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), +1);
 			}else if(command.terrainDown){
 				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), -1);
+			}else if(command.meteorite){
+				meteoraAction(action.position);
 			}
 			
+			
 		}
-		
 		
 		function resetAllBTN(){
 			
@@ -664,7 +664,6 @@
 							xT = parseInt((Math.random()-0.5)*2*vista);
 							zT = parseInt((Math.random()-0.5)*2*vista);
 							var valY = parseInt((Math.random()-0.5)*3);
-							console.log(valY);
 							modifyTerrainHigh(new THREE.Vector3((gX+xT),0,(gZ+zT)),valY);
 							cropWorld.position.set((-vista-0.333)+Math.sin(x*1000)/10*scala/3,0,(-vista-0.333)+Math.cos(x*1000)/10*scala/3);
 							stato += 0.5;
@@ -672,27 +671,70 @@
 					},50);
 			}
 		}
-		
 		function waveAction(){
 			if(!isRunningAction){
 				isRunningAction = true;
 				
-				
+				var time=0;
 				
 				var intervallo = setInterval(function(){
-						if(waveX<-vista-2){
+						if(time>10){
 							clearInterval(intervallo);
 							isRunningAction=false;
 							resetAllBTN();
-							waveX=vista+2;
+							materialWater.uniforms.waveX.value=0;
 							return;
 						}else{
-							waveX-=0.5;
+							if(time<=2)
+								materialWater.uniforms.waveX.value+=0.05;
+							if(time>=8)
+								materialWater.uniforms.waveX.value-=0.05;
+							time+=0.1;
 						}		
-						console.log("wave");
-						console.log(waveX);
-					},200);
+					},100);
 			}
+		}
+		function meteoraAction(positione){
+			if(!isRunningAction){
+				isRunningAction = true;
+				
+				var time=0;
+				var meteora = new THREE.Mesh(geometry, material);
+				var pos = positione.clone();
+				pos.x+=gX-0.5;
+				pos.z+=gZ-0.5;
+				meteora.position.set(positione.x-vista-0.5,15, positione.z-vista-0.5);
+				scene.add(meteora);
+				
+				var intervallo = setInterval(function(){
+						if(meteora.position.y<=pos.y){
+							clearInterval(intervallo);
+							isRunningAction=false;
+							resetAllBTN();
+							scene.remove(meteora);
+							createCratere(pos,3);
+							
+							return;
+						}else{
+							meteora.position.y-=time;
+							time+=0.25;
+						}		
+					},100);
+			}
+		}
+		
+		function createCratere(pos, n){
+			var sqrt = Math.sqrt(data.length);
+			console.log("posizione1: ");
+			console.log(pos);
+			for(var i2=0; i2<n; i2++){
+				for(var i=-n+i2+1; i<n-i2; i++){
+					for(var iz=-n+i2+1; iz<n-i2; iz++){
+						data[(i+pos.x)+(iz+pos.z)*sqrt]-=1;
+					}
+				}
+			}	
+			updateTerrainVis();
 		}
 		
 		function buttonAction(action){
@@ -773,7 +815,6 @@
 								resetCommand();
 								command.meteorite = true;
 								action.position.y=-0.3;
-								
 							}
 							break;
 						case 2:
@@ -788,7 +829,6 @@
 						case 0:
 							buttonAnimation(action);
 							rotateA -= Math.PI/2;
-							console.log(rotateA);
 							break;
 						case 1:
 							if(!isRunningAction){
@@ -887,7 +927,7 @@
 						gX+=-Math.cos(rotateA);
 					}else{
 						gX+=-Math.sin(rotateA);
-						gZ+=Math.sin(rotateA);
+						gZ+=-Math.sin(rotateA);
 					}
 					break;
 			}
@@ -925,9 +965,7 @@
 
 		}
 		function onDocumentKeyDown(event) {
-				
-				console.log(event.which);
-			
+							
 				var keyCode = event.which;
 				if (keyCode == 87 && clWS) {
 					directionAction(2);
@@ -946,8 +984,10 @@
 				
 				if(keyCode == 107 || keyCode == 171){
 					zoom += 0.05;
+					onWindowResize();
 				}else if(keyCode == 109 || keyCode == 173){
 					zoom -= 0.05;
+					onWindowResize();
 				}
 				
 				
@@ -984,7 +1024,7 @@
 				for(var i=0; i<cropWorld.children.length; i++) {
 							
 							if (cropWorld.children[i].uuid===o) {
-								action(cropWorld.children[i].clone());
+								actionFunction(cropWorld.children[i].clone());
 								mousePressed = false;
 							} 
 					}
