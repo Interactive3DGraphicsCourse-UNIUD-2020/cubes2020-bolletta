@@ -29,6 +29,10 @@
 	- 1/10/19
 		Aggiunta bottoni comando x posizione
 		Aggiunta funzione per alzare o abassare il terreno,+ btn x controllarlo
+		aggiunti btn per terremoto, tzunami(errore di alpha), meteorite(ancora non implementato)
+			rotazione con correzione di direzione e zoom in/out
+		vertexWater  tzunami ma errore alpha
+		
 	
 	
 		
