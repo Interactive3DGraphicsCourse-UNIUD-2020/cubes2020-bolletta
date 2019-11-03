@@ -16,6 +16,50 @@
 		}
 	
 	</style>
+		<script id="fragmentBussola" type="glsl/x-fragment">
+			float PI = 3.1415926535897932384626433832795;
+			
+			uniform sampler2D tex;
+			uniform sampler2D bacText;
+			uniform sampler2D shadText;
+			uniform float alpha;
+			varying vec2 vUv;
+			varying vec3 vPosition;
+			varying vec3 vNormal;
+				
+			vec2 rotate(float alpha1,vec2 uVu){
+				float med = 0.5;
+				return vec2(
+					cos(alpha1) * (uVu.x - med) + sin(alpha1) * (uVu.y - med) + med,
+					cos(alpha1) * (uVu.y - med) - sin(alpha1) * (uVu.x - med) + med
+				);
+			}
+
+			void main() {
+				vec2 uVu = rotate(alpha, vUv);
+				float shaderFactor = dot(vNormal, vec3(2., 1., 1.));
+				
+				
+				
+				vec4 color = texture2D(tex, uVu);
+				vec4 color2 = texture2D(shadText, vUv);
+				vec4 colorSotto = texture2D(bacText,  rotate(PI, vUv));
+				vec4 colorBase = vec4(vec3(0.8,0.6,0.0)*(shaderFactor),1.0);
+				
+				if(vPosition.y>=0.2){
+					if(colorSotto.g<=(colorSotto.r+0.1) && (colorSotto.b+0.1)>=colorSotto.g){
+						if(color.a>0.1)
+							gl_FragColor = color;
+						else
+							gl_FragColor = colorSotto;
+					}else{
+						gl_FragColor = colorBase+(color2);
+					}
+				}else
+					gl_FragColor = colorBase;
+			}
+			
+		</script>
 		<script id="fragmentButton" type="glsl/x-fragment">
 			
 			uniform sampler2D tex;
@@ -318,41 +362,46 @@
 		
 		<script>
 		
-		var scene, renderer, stats, camera, data, sun;
-		var gX 	  = 5, gZ = 5;
-		var vista = 5, x  = 0, zoom = 1, rotateA=0;
-		var waveX = +vista+2;
-		var isRunningAction = false;
+		var scene, renderer, stats, camera, data, sun, bussola;
+		var gX, gZ;
+		var vista, x, zoom, rotateA;
+		var waveX;
+		var isRunningAction;
 		
-		var geometry 				= new THREE.BoxGeometry(1,1,1);
-		var material 				= new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
-		var texture					= new THREE.ImageUtils.loadTexture("textures/sand.jpg");
-		var materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
-		var materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
-		var materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
-		var materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
-		var materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
-			materialGrass.uniforms.tex.value.wrapS  = THREE.RepeatWrapping;
-			materialGrass.uniforms.tex.value.wrapT  = THREE.RepeatWrapping;
-		var materialButton			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
-			
+		var geometry;
+		var material;
+		var texture;
+		var materialSand;
+		var materialBadRock;
+		var materialSnow;
+		var materialWater;
+		var materialGrass;
+		var materialButton;
+		var materialBussola;
+		
 		var cube,cropWorld;
 		var touchableItem;
 		
-		var clWS=true, clAD=true;
+		var clWS, clAD;
 		
-		var raycaster    = new THREE.Raycaster();
-		var mousePos     = new THREE.Vector2();
-		var mousePressed = false;
+		var raycaster;
+		var mousePos;
+		var mousePressed;
 		
 		
 		var command	 = { terrainUp: true, terrainDown:false, terremoto:false, meteorite:false, onda:false};
 		
-		
+		//DOcument.getElementById(id) => i(id)
+		//REQUIRE ID of element, String
+		//RETURN Element if exist
 		function i(id){
 			return document.getElementById(id);
 		}
 		
+		//return height from image
+		//REQUIRE img, path of image 
+		//REQUIRE scale, scale of height
+		//RETURN data, array of int
 		function getHeightData(img,scale) {
   
 		 if (scale == undefined) scale=1;
@@ -384,6 +433,7 @@
 		    return data;
 		}
 		
+		//initiate button near world(left)
 		function initiateButton(){
 			var button = [];
 			var parteSoto;			
@@ -445,6 +495,7 @@
 			touchableItem.position.set(-8,2.5,1.5);
 		}	
 		
+		//initiate terrain from image(textures/heightmap2.png)
 		function initiateTerrain(){
 			
 			
@@ -457,6 +508,64 @@
 			}
 		}
 		
+		//initiate all variable
+		function initiate(){
+			
+			gX 	= 5;
+			gZ  = 5;
+			x   = 0;
+			zoom    = 1;
+			rotateA = 0;
+			vista 	= 5;
+			waveX   = +vista+2;
+			
+			isRunningAction = false;
+			
+			geometry 				= new THREE.BoxGeometry(1,1,1);
+			material 				= new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
+			texture					= new THREE.ImageUtils.loadTexture("textures/sand.jpg");
+			materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
+			materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
+			materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
+			materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
+			materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
+			materialButton			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
+			materialBussola			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaN.png")}, bacText : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaSotto.png")}, shadText: {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaB.png")}, alpha: {type:"f", value:Math.PI}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBussola").innerHTML, transparent:true});
+				
+			clWS	= true;
+			clAD	= true;
+			
+			raycaster    = new THREE.Raycaster();
+			mousePos     = new THREE.Vector2();
+			mousePressed = false;
+			
+			sun 			= new THREE.DirectionalLight(0xddddff, 1.5);
+			scene 			= new THREE.Scene();
+			camera 			= new THREE.OrthographicCamera(-window.innerWidth/64*zoom, window.innerWidth/64*zoom, window.innerHeight/44*zoom, -window.innerHeight/44*zoom, 0.01, 400);
+			touchableItem 	= new THREE.Object3D();
+			stats 			= new Stats();
+			renderer 		= new THREE.WebGLRenderer( {antialias: true} );
+			bussola			= new THREE.Mesh(new THREE.CylinderGeometry(1,1,0.5,32), materialBussola);
+			
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0x040404 );
+			renderer.shadowMapEnabled 		 = true;																			
+			renderer.shadowMap.type   		 = THREE.PCFSoftShadowMap;
+			renderer.physicallyCorrectLights = true;
+			
+			materialGrass.uniforms.tex.value.wrapS  = THREE.RepeatWrapping;
+			materialGrass.uniforms.tex.value.wrapT  = THREE.RepeatWrapping;
+						
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top 		= '0px';
+			
+			resetCommand();
+			initiateTerrain();
+		}
+		
+		//Select material from heigth
+		//REQUIRE posY value of y position
+		//RETURN material
 		function materiale(posY){
 			if(posY==0)
 				return new THREE.Mesh(geometry, materialBadRock);
@@ -464,15 +573,18 @@
 				return new THREE.Mesh(geometry, materialSand);
 			else if(posY<=5)
 				return new THREE.Mesh( geometry, materialGrass );
-			else if(posY<=7)
+			else 
 				return new THREE.Mesh( geometry, materialSnow );
-			else
-				return new THREE.Mesh( geometry, material );
+			
 		}
 		
+		//modify terrain from position (data axis) and height value to add or subtruct
+		//REQUIRE position, position inside data axis
+		//REQUIRE value, value to add, or subtruct if negative
 		function modifyTerrainHigh(position,value){
 			var sqrt = Math.sqrt(data.length);
-			if(data[position.x+position.z*sqrt]+value>0)
+			console.log(position);
+			if(data[position.x+position.z*sqrt]+value>0 && data[position.x+position.z*sqrt]<10)
 				if(position.x>=0 && position.x<sqrt &&	
 					position.z>=0 && position.z<sqrt){
 						data[position.x+position.z*sqrt]+=value;
@@ -480,6 +592,7 @@
 					}
 		}
 	
+		//update terrain for updating
 		function updateTerrainVis(){
 			
 			cube = new THREE.Mesh( geometry, material );
@@ -510,76 +623,51 @@
 			scene.children[0]=(cropWorld);
 		}
 	
-		
+		//Main function
+		//create sea and table
 		function Start() {			
-			sun = new THREE.DirectionalLight(0xddddff, 1.5);
 			var ambient =  new THREE.DirectionalLight(0xffffaa, 0.5);
 			
-			scene = new THREE.Scene();
-			camera = new THREE.OrthographicCamera(-window.innerWidth/64*zoom, window.innerWidth/64*zoom, window.innerHeight/44*zoom, -window.innerHeight/44*zoom, 0.01, 400);
+			initiate();
 			
 			scene.add(new THREE.Object3D());
 			scene.add(new THREE.Object3D());
-			
-			resetCommand();
-			initiateTerrain();
-			
-			touchableItem = new THREE.Object3D();
-
-			renderer = new THREE.WebGLRenderer( {antialias: true} );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setClearColor( 0x040404 );
-			renderer.shadowMapEnabled = true;																			
-			renderer.shadowMap.type   = THREE.PCFSoftShadowMap;
-			renderer.physicallyCorrectLights = true;
-				
+							
 			document.body.appendChild( renderer.domElement );
+			//document.body.appendChild( stats.domElement );
 			
-			camera.position.set(-1, 12, -1);
-			camera.rotation.set(-1.137, 0.398, 0.666);
-						
-			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			document.body.appendChild( stats.domElement );
-			/*
-			sun.castShadow = true;
-			sun.shadowCameraVisible = true;		
-			sun.shadowMapWidth  = 512*2;
-			sun.shadowMapHeight = 512*2;
-			sun.shadow.radius   = 2;
-			
-			d = 15;
-			sun.shadow.camera.left   = -d;
-			sun.shadow.camera.right  = d;
-			sun.shadow.camera.top    = d;
-			sun.shadow.camera.bottom = -d;			
-			*/
 			scene.add(sun);
 			scene.add(ambient);
 			
 			
+			camera.position.set(-1, 12, -1);
+			camera.rotation.set(-1.137, 0.398, 0.666);
+			
 			var sea = new THREE.Mesh(new THREE.PlaneGeometry(vista*2+2,vista*2+2,320,320), materialWater);
+			var table = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("textures/table_alpha.png"),transparent:true}));
+			
+			
 			sea.rotation.set(-Math.PI/2, 0, 0);
 			sea.position.set(-vista-0.6, 2.4, -vista-0.6);
-			scene.children[1]=(sea);
+			scene.children[1] = (sea);
 			
-			initiateButton();
-				
-			
-			var table = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("textures/table_alpha.png"),transparent:true}));
 			table.rotation.set(-Math.PI/2, 0, 0);
 			table.position.set(-5,2.5,-5);
 			scene.add(table);
 			
+			bussola.position.set(2.5, 3, -2*vista-1);
+			scene.add(bussola);
 			
+			initiateButton();
 			onWindowResize();
 			
 		}
 		
+		//function update
+		//update shader, sun position, time variable ( x ) and call render
 		function Update() {
 			requestAnimationFrame( Update ); 
-			stats.update();
+			//stats.update();
 			
 			sunUpdate();
 			shaderUpdate();
@@ -588,6 +676,7 @@
 			x=Date.now()/10000%(2*Math.PI);
 		}
 		
+		//update sun position and color
 		function sunUpdate(){
 			
 			sun.position.set(Math.cos(x)*(vista*20), (Math.sin(x)*(vista*20)), -Math.cos(x)*(vista*20));
@@ -597,6 +686,9 @@
 			
 		}
 		
+		//update shader variable
+		//delta = time 
+		//lightPos = position of sun
 		function shaderUpdate(){
 			materialSand.uniforms.delta.value = x;
 			materialWater.uniforms.delta.value = x;
@@ -604,24 +696,27 @@
 			materialSnow.uniforms.delta.value = x;
 			materialWater.uniforms.delta.value = x;
 			
+			materialBussola.uniforms.alpha.value = rotateA+Math.PI;
+			
 			materialSand.uniforms.lightPos.value = sun.position;
 			materialGrass.uniforms.lightPos.value = sun.position;
 			materialSnow.uniforms.lightPos.value = sun.position;
 			materialWater.uniforms.lightPos.value = sun.position;
 		}
 		
+		
+		//RENDER--
 		function Render() {
 			
 			renderer.render(scene, camera);
 		}
 		
-		
+		//switch action for terrain height and meteora
 		function actionFunction(action){
-			var offset = new THREE.Vector3(gX+vista, 0, gZ+vista);
 			if(command.terrainUp){
-				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), +1);
+				modifyTerrainHigh(new THREE.Vector3(parseInt(action.position.x+gX), action.position.y, parseInt(action.position.z+gZ)), +1);
 			}else if(command.terrainDown){
-				modifyTerrainHigh(new THREE.Vector3(action.position.x, action.position.y, action.position.z), -1);
+				modifyTerrainHigh(new THREE.Vector3(parseInt(action.position.x+gX), action.position.y, parseInt(action.position.z+gZ)), -1);
 			}else if(command.meteorite){
 				meteoraAction(action.position);
 			}
@@ -629,12 +724,16 @@
 			
 		}
 		
+		
+		//reset position y of button (left table)
 		function resetAllBTN(){
 			
 			for(var i=0; i<touchableItem.children.length; i++){
 				touchableItem.children[i].position.y=0;
 			}
 		}
+		
+		//reset command variable
 		function resetCommand(){
 			command.terrainUp	= false;
 			command.terrainDown	= false;
@@ -643,6 +742,11 @@
 			command.onda		= false;
 		}
 		
+		
+		//function to manage terremoto
+		//!! Create interval and destroy it !!
+		//update terrain height but not save it
+		//animate x,y all terrain position, return origin position at the and
 		function terremotoAction(){
 			if(!isRunningAction){
 				isRunningAction = true;
@@ -671,6 +775,10 @@
 					},50);
 			}
 		}
+		
+		//function to manage tzunami
+		//!! Create interval and destroy it !!
+		//animate y vertex of sea, return vertex y origin at the and
 		function waveAction(){
 			if(!isRunningAction){
 				isRunningAction = true;
@@ -694,10 +802,17 @@
 					},100);
 			}
 		}
+		
+		
+		//function to manage meteora
+		//!! Create interval and destroy it !!
+		//!! Create cube(meteora) and destroy it !!
+		//create a hole in terrain
+		//REQUIRE positione, position of relative world(cropWorld axis)
 		function meteoraAction(positione){
 			if(!isRunningAction){
 				isRunningAction = true;
-				
+				console.log(positione);
 				var time=0;
 				var meteora = new THREE.Mesh(geometry, material);
 				var pos = positione.clone();
@@ -723,6 +838,9 @@
 			}
 		}
 		
+		//create a hole inside terrain
+		//REQUIRE pos position inside data axis
+		//REQUIRE n, ~ size of hole
 		function createCratere(pos, n){
 			var sqrt = Math.sqrt(data.length);
 			console.log("posizione1: ");
@@ -737,6 +855,8 @@
 			updateTerrainVis();
 		}
 		
+		//manage button click(left world button)
+		//require position of button world axis
 		function buttonAction(action){
 						
 			
@@ -856,6 +976,8 @@
 			
 		}
 	
+		//animate button click
+		//REQUIRE button clicked
 		function buttonAnimation(btn){
 			btn.position.y = -0.2;
 			var intervallo = setInterval(function(){
@@ -868,6 +990,8 @@
 			},100);
 		}
 		
+		//animate terrain move 
+		//REQUIRE dir, 0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west
 		function directionAction(dir){
 			switch(dir){
 				case 0:
@@ -938,7 +1062,7 @@
 			
 		}
 		
-		
+		//Listener 
 		window.addEventListener( 'resize', onWindowResize, false );
 		document.addEventListener("keydown", onDocumentKeyDown, false);
 		document.addEventListener("keyup", function(e){ 
@@ -949,6 +1073,8 @@
 		document.addEventListener( 'mousedown', onDocumentMouseDown, false );    
 		document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
+
+		//resize window when page is resize or when zoom in/out
 		function onWindowResize(){
 			
 			
@@ -964,6 +1090,9 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
+		
+		//manage keyboard button
+		//WASD to move, +,- to zoom
 		function onDocumentKeyDown(event) {
 							
 				var keyCode = event.which;
@@ -992,6 +1121,9 @@
 				
 				
 			}		
+		
+		//manage click inside world
+		//button and terrain
 		function onDocumentMouseDown( event ) { 
 			mousePressed=true;
 			
@@ -1037,13 +1169,17 @@
 					}
 			}
 		}
+		
+		//end press
 		function onDocumentMouseUp( event ) { mousePressed = false;}
+		
+		//mouse position
 		function onDocumentMouseMove( event ) {
 			mousePos.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mousePos.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 		}
 
-		
+		//crop function
 		function lim(val, min, max){
 			return Math.min(max, Math.max(val, min));
 		}
