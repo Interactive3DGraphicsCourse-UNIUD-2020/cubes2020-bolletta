@@ -624,7 +624,7 @@
 		}
 	
 		//Main function
-		//create sea and table
+		//create sea and table and bussola
 		function Start() {			
 			var ambient =  new THREE.DirectionalLight(0xffffaa, 0.5);
 			
@@ -655,7 +655,7 @@
 			table.position.set(-5,2.5,-5);
 			scene.add(table);
 			
-			bussola.position.set(2.5, 3, -2*vista-1);
+			bussola.position.set(2.5, 3, -2*vista-2.5);
 			scene.add(bussola);
 			
 			initiateButton();

@@ -143,7 +143,7 @@ editor di testo Notepad++ ver: 7.7.1
 server Web Apache ver: 2.4
 
 #### Aggiunte future (modificabile)
-
+* aggiunti UI x indicare fase del giorno
 * aggiunta popolo che si auto gestisce
 * ottimizzazione voxel con creazione di un unica mesh anzichè tanti cubi
 * creazione shader meteora e effetto esplosione impatto (sfera che cresce e scompare)
