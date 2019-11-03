@@ -33,7 +33,7 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 	
 * 9 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
 
-![Image arrow](/textures/arrow.png)
+	![Image arrow](/textures/arrow.png)
 
 * 2 bottoni per gestire l'altezza terreno
 
@@ -41,23 +41,23 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 
 * bottone potere terremoto
 
-![Image trremoto](/textures/terremoto.png)
+	![Image trremoto](/textures/terremoto.png)
 
 * bottoni per lo zoom
 
-![Image piu](/textures/piu.png) ![Image meno](/textures/meno.png)
+	![Image piu](/textures/piu.png) ![Image meno](/textures/meno.png)
 
 * bottoni per ruotare la mappa
 
-![Image Clock](/textures/Clock.png) ![Image AClock](/textures/AClock.png)
+	![Image Clock](/textures/Clock.png) ![Image AClock](/textures/AClock.png)
 
 * bottone potere tzunami
 
-![Image wave](/textures/wave.png)
+	![Image wave](/textures/wave.png)
 
 * bottone potere meteorite
 
-![Image meteora](/textures/meterora.png)
+	![Image meteora](/textures/meterora.png)
 
 di una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile
 
@@ -70,7 +70,7 @@ di una bussola che indica la posizione, il tutto su un tavolo al cui centro si p
 	il Terremoto va a modificare l'aspetto del terreno alzando e abassando l'altezza massima dei blocchi con una semplice 
 	animazione di tutta la mappa al centro, simulando un terremoto ondulatorio
 
-*Tzunami:
+* Tzunami:
 	lo Tzunami va ad alzare l'acqua con una mappa a punti,non interferisce in nessun modo con il terreno ma ha solo
 	carattere grafico
 
