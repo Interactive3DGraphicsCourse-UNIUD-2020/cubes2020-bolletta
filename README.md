@@ -28,24 +28,40 @@ Il progetto ripropone il gestore del mondo di populous semplificato in chiave vo
 terremoto, lo tzunami e la meteorite.
 
 #### Interfaccia
+
 	L' interfaccia si compone di un tastierino sulla sinistra con le seguenti feature dal alto-sinistro muovendosi per righe crescenti:
 		* 9 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
+			
 			![Image arrow](/textures/arrow.png)
+		
 		* 2 bottoni per gestire l'altezza terreno
-			![Image alza](/textures/alza.png) ![Image bassa](/textures/bassa.png)
+		
+				![Image alza](/textures/alza.png) ![Image bassa](/textures/bassa.png)
+		
 		* bottone potere terremoto
+			
 			![Image trremoto](/textures/terremoto.png)
+		
 		* bottoni per lo zoom
+			
 			![Image piu](/textures/piu.png) ![Image meno](/textures/meno.png)
+		
 		* bottoni per ruotare la mappa
+			
 			![Image Clock](/textures/Clock.png) ![Image AClock](/textures/AClock.png)
+		
 		* bottone potere tzunami
+			
 			![Image wave](/textures/wave.png)
+		
 		* bottone potere meteorite
+			
 			![Image meteora](/textures/meterora.png)
+	
 	di una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile
 
 #### Poteri
+
 	* altezza Terreno:
 		si può alzare o abassare il terreno andando a premere i bottoni adeguati e cliccando poi la mappa
 	
