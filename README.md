@@ -59,7 +59,7 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 
 	![Image meteora](/textures/meterora.png)
 
-di una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile
+sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile
 
 #### Poteri
 
