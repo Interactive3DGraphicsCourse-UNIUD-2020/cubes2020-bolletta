@@ -40,6 +40,11 @@
 	
 	* 3/10/19:
 		aggiunta bussola con direzione
+	
+	* 4/10/19
+		Aggiunta scambio giorno notte un po netto
+		aggiunto orologio in alto a sinistra
+		correzione bug di shader
 		
 	
 	

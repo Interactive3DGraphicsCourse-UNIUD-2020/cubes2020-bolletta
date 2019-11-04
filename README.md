@@ -134,6 +134,11 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 				
 * 3/10/19
 	aggiunta bussola con direzione
+
+* 4/10/19
+	Implemetato fasi giorno notte, con passaggio poco sfumato
+	implementato orologio in alto a sinistra per fasi giorno
+	correzione bug di shader
 	
 #### Programmi usati
 
@@ -143,7 +148,6 @@ editor di testo Notepad++ ver: 7.7.1
 server Web Apache ver: 2.4
 
 #### Aggiunte future (modificabile)
-* aggiunti UI x indicare fase del giorno
 * aggiunta popolo che si auto gestisce
 * ottimizzazione voxel con creazione di un unica mesh anzichè tanti cubi
 * creazione shader meteora e effetto esplosione impatto (sfera che cresce e scompare)

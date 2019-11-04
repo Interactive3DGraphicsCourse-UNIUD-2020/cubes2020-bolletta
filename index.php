@@ -2,7 +2,9 @@
 	<head>
 		<title>Starting Code for 1st Project 2017</title>
 		<style>
-		
+		:root{
+			--alpha : 90deg;
+		}
 		body {
 			font-family: Monospace;
 			background-color: #f0f0f0;
@@ -13,6 +15,34 @@
 		canvas { 
 			width: 100%; 
 			height: 100%;
+		}
+		
+		#Orologio{
+			background-image	: URL("textures/dayNightOro.png");
+			position 			: absolute;
+			top					: -18%;
+			left				: -18%;
+			background-size		: cover; 
+			-webkit-transform:rotate(90eg);
+			-moz-transform: rotate(90deg);
+			-ms-transform: rotate(90deg);
+			-o-transform: rotate(90deg);
+			transform: rotate(90deg);
+			z-index 			: 5;
+		}
+		
+		#Timee{
+			background-image	: URL("textures/dayNightClock.png");
+			position 			: absolute;
+			top					: -18%;
+			left				: -18%;
+			background-size		: cover; 
+			-webkit-transform:rotate(var(--alpha));
+			-moz-transform: rotate(var(--alpha));
+			-ms-transform: rotate(var(--alpha));
+			-o-transform: rotate(var(--alpha));
+			transform: rotate(var(--alpha));
+			z-index 	: 1;
 		}
 	
 	</style>
@@ -106,6 +136,7 @@
 			uniform sampler2D tex;
 			uniform float delta;
 			uniform vec3 lightPos;
+			uniform vec3 LightColor;
 
 			varying vec2 vUv;
 			varying vec3 vNormal;
@@ -120,7 +151,7 @@
 			
 
 			void main() {
-				light =   vec3(0.8);
+				light =   LightColor;
 				vec4 color = texture2D(tex, vUv);
 				vec2 st = vUv.xy;
 				
@@ -138,8 +169,11 @@
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
 					gl_FragColor = 1.15*shade_factor*vec4(1.,1.,1.,1.0)*max(0.85,(sin(delta)+0.5));
-				else
+				else{
 					gl_FragColor = vec4(vec3(dot(color.rgb, vec3(0.299, 0.587, 0.114)))*1.35,1.0);
+					gl_FragColor = (gl_FragColor+vec4(light/1.5, 1.0))/2.;
+				}
+				
 				
 			}
 			
@@ -149,6 +183,7 @@
 			uniform sampler2D tex;
 			uniform float delta;
 			uniform vec3 lightPos;
+			uniform vec3 LightColor;
 
 			varying vec2 vUv;
 			varying vec3 vNormal;
@@ -163,7 +198,7 @@
 			
 
 			void main() {
-				light =   vec3(0.9, 0.9, 0.6);
+				light =  LightColor;
 				vec4 color = texture2D(tex, vUv);
 				vec2 st = vUv.xy;
 				
@@ -176,14 +211,15 @@
 				
 				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
 				
-				color = color*shade_factor*max(min((sin(delta)/1.15),0.4), 0.85);
+				color = color*shade_factor*max(min((sin(mod(delta,3.14))/1.15),0.4), 0.85);
 				
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
 					gl_FragColor = 1.15*shade_factor*vec4(1.0,0.75,0.1,1.0)*max(0.85,(sin(delta)+0.5));
-				else
+				else{
 					gl_FragColor = color;
-				
+					gl_FragColor = (gl_FragColor+vec4(light/1.5, 1.0))/2.;
+				}
 			}
 			
 		</script>
@@ -192,6 +228,7 @@
 			uniform sampler2D tex;
 			uniform float delta;
 			uniform vec3 lightPos;
+			uniform vec3 LightColor;
 
 			varying vec2 vUv;
 			varying vec3 vNormal;
@@ -206,7 +243,7 @@
 			
 
 			void main() {
-				light =   vec3(0.9, 0.9, 0.6);
+				light =   LightColor;
 				vec4 color = texture2D(tex, vUv);
 				vec2 st = vUv.xy;
 				
@@ -224,6 +261,7 @@
 			
 			uniform float delta;
 			uniform vec3 lightPos;
+			uniform vec3 LightColor;
 			
 			varying vec2 vUv;
 			varying vec3 vNormal;
@@ -258,7 +296,7 @@
 					color = colorbase;
 				else
 					color = vec4(1.0);
-				gl_FragColor = vec4(color.rgb*(max(0.2,(sin(delta)/2.0)+0.5)+(vec3(max(0.,min(1.0,0.5-vPosition.z))))),color.a);
+				gl_FragColor = vec4((color.rgb*(max(0.2,(sin(delta)/2.0)+0.5)+(vec3(max(0.,min(1.0,0.5-vPosition.z)))))),color.a);
 			}
 		</script>
 		<script id="fragmentGrass" type="glsl/x-fragment">
@@ -267,6 +305,7 @@
 			uniform sampler2D texLato;
 			uniform float delta;
 			uniform vec3 lightPos;
+			uniform vec3 LightColor;
 
 			varying vec2 vUv;
 			varying vec3 vNormal;
@@ -280,7 +319,7 @@
 				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
 				vec4 color;
 				
-				light =   vec3(0.2, 0.8, 0.05);
+				light =   ((LightColor/1.5)+vec3(0.2,0.8,0.2))/2.;
 								
 				
 				if(vPosition.y>0.45){
@@ -359,7 +398,10 @@
 		<script src="lib/OrbitControls.js"></script>
 	</head>
 	<body>
-		
+		<div id="Orologio">
+		</div>
+		<div id="Timee">
+		</div>
 		<script>
 		
 		var scene, renderer, stats, camera, data, sun, bussola;
@@ -367,6 +409,7 @@
 		var vista, x, zoom, rotateA;
 		var waveX;
 		var isRunningAction;
+		var isDay;
 		
 		var geometry;
 		var material;
@@ -520,15 +563,16 @@
 			waveX   = +vista+2;
 			
 			isRunningAction = false;
+			isDay			= true;
 			
 			geometry 				= new THREE.BoxGeometry(1,1,1);
 			material 				= new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 			texture					= new THREE.ImageUtils.loadTexture("textures/sand.jpg");
-			materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
-			materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
-			materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
-			materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
-			materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
+			materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
+			materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
+			materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
+			materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
+			materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
 			materialButton			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
 			materialBussola			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaN.png")}, bacText : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaSotto.png")}, shadText: {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaB.png")}, alpha: {type:"f", value:Math.PI}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBussola").innerHTML, transparent:true});
 				
@@ -635,6 +679,10 @@
 							
 			document.body.appendChild( renderer.domElement );
 			//document.body.appendChild( stats.domElement );
+			document.getElementById("Orologio").style.width  = window.innerWidth/10*4;
+			document.getElementById("Orologio").style.height = window.innerWidth/10*4;
+			document.getElementById("Timee").style.width	 = window.innerWidth/10*4;
+			document.getElementById("Timee").style.height 	 = window.innerWidth/10*4;
 			
 			scene.add(sun);
 			scene.add(ambient);
@@ -674,15 +722,27 @@
 			
 			Render();
 			x=Date.now()/10000%(2*Math.PI);
+			isDay=(x>=Math.PI);
+			
 		}
 		
 		//update sun position and color
 		function sunUpdate(){
 			
-			sun.position.set(Math.cos(x)*(vista*20), (Math.sin(x)*(vista*20)), -Math.cos(x)*(vista*20));
-			sun.color.r = (Math.abs((Math.sin(x))*0.9)-0.1)%1;
-			sun.color.g = (Math.abs((Math.sin(x))*0.9)-0.1)%1;
-			sun.color.b = (Math.abs((Math.sin(x))*0.6)-0.1)%1;
+			sun.position.set(-vista, Math.abs(Math.sin(x)*(vista*20)), Math.cos((isDay? x:x+Math.PI))*(vista*20));
+			
+			if(isDay){
+				sun.color.r = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.9));
+				sun.color.g = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.9));
+				sun.color.b = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.8));
+			}else{
+				sun.color.r = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.7));
+				sun.color.g = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.7));
+				sun.color.b = Math.min(1, Math.max(0.0,Math.abs(Math.sin(x))*0.9));
+			}
+			
+			document.documentElement.style.setProperty('--alpha', x+'rad')
+			
 			
 		}
 		
@@ -690,10 +750,10 @@
 		//delta = time 
 		//lightPos = position of sun
 		function shaderUpdate(){
-			materialSand.uniforms.delta.value = x;
+			materialSand.uniforms.delta.value = (isDay? x:x+Math.PI);
 			materialWater.uniforms.delta.value = x;
 			materialGrass.uniforms.delta.value = x;
-			materialSnow.uniforms.delta.value = x;
+			materialSnow.uniforms.delta.value = (isDay? x:x+Math.PI);
 			materialWater.uniforms.delta.value = x;
 			
 			materialBussola.uniforms.alpha.value = rotateA+Math.PI;
@@ -702,6 +762,13 @@
 			materialGrass.uniforms.lightPos.value = sun.position;
 			materialSnow.uniforms.lightPos.value = sun.position;
 			materialWater.uniforms.lightPos.value = sun.position;
+			
+			
+			materialSand.uniforms.LightColor.value = sun.color;
+			materialGrass.uniforms.LightColor.value = sun.color;
+			materialSnow.uniforms.LightColor.value = sun.color;
+			materialWater.uniforms.LightColor.value = sun.color;
+			
 		}
 		
 		
@@ -1088,7 +1155,17 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
+			
+			
+			document.getElementById("Orologio").style.width  = window.innerWidth/10*2;
+			document.getElementById("Orologio").style.height = window.innerWidth/10*2;
+			document.getElementById("Timee").style.width	 = window.innerWidth/10*2;
+			document.getElementById("Timee").style.height 	 = window.innerWidth/10*2;
+			
+			document.getElementById("Orologio").style.top    = -window.innerWidth/10;
+			document.getElementById("Orologio").style.left   = -window.innerWidth/10;
+			document.getElementById("Timee").style.top  	 = -window.innerWidth/10;
+			document.getElementById("Timee").style.left 	 = -window.innerWidth/10;
 		}
 		
 		//manage keyboard button
