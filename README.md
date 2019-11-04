@@ -142,10 +142,10 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 	
 #### Programmi usati
 
-immagini e texture Paint.net ver: 4.205
-shader test ShaderToy	
-editor di testo Notepad++ ver: 7.7.1
-server Web Apache ver: 2.4
+* immagini e texture Paint.net ver: 4.205
+* shader test ShaderToy	
+* editor di testo Notepad++ ver: 7.7.1
+* server Web Apache ver: 2.4
 
 #### Aggiunte future (modificabile)
 * aggiunta popolo che si auto gestisce
