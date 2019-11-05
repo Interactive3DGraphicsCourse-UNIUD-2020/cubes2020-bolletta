@@ -60,7 +60,7 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 	![Image meteora](/textures/meterora.png)
 
 sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile.  
-Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e com + e - si effettua uno zoom
+Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e con + e - si effettua uno zoom
 
 
 #### Poteri
