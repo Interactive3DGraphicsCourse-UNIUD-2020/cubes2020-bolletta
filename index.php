@@ -547,7 +547,7 @@
 		    var context = canvas.getContext( '2d' );
  
 		    var size = img.width * img.height;
-			console.log("World size: "+size);
+			//console.log("World size: "+size);
 		    var data = new Float32Array( size );
  
 		    context.drawImage(img,0,0);
@@ -725,7 +725,7 @@
 		//REQUIRE value, value to add, or subtruct if negative
 		function modifyTerrainHigh(position,value){
 			var sqrt = Math.sqrt(data.length);
-			console.log(position);
+			//console.log(position);
 			if(data[position.x+position.z*sqrt]+value>0 && data[position.x+position.z*sqrt]<10)
 				if(position.x>=0 && position.x<sqrt &&	
 					position.z>=0 && position.z<sqrt){
@@ -759,6 +759,7 @@
 					}
 				}
 			}
+			//console.log("CropSize: "+cropWorld.children.length);
 			cropWorld.position.set(-vista-0.5, 0,- vista-0.5);
 			cropWorld.rotation.y = rotateA;
 			scene.children[1].rotation.z=rotateA;
@@ -980,7 +981,7 @@
 		function meteoraAction(positione){
 			if(!isRunningAction){
 				isRunningAction = true;
-				console.log(positione);
+				//console.log(positione);
 				var time=0;
 				var meteora = new THREE.Mesh(geometry, materialMeteora);
 				var pos = positione.clone();
@@ -1022,8 +1023,8 @@
 		//REQUIRE n, ~ size of hole
 		function createCratere(pos, n){
 			var sqrt = Math.sqrt(data.length);
-			console.log("posizione1: ");
-			console.log(pos);
+			//console.log("posizione1: ");
+			//console.log(pos);
 			for(var i2=0; i2<n; i2++){
 				for(var i=-n+i2+1; i<n-i2; i++){
 					for(var iz=-n+i2+1; iz<n-i2; iz++){
