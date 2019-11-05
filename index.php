@@ -523,8 +523,8 @@
 		var mousePos;
 		var mousePressed;
 		
-		
-		var command	 = { terrainUp: true, terrainDown:false, terremoto:false, meteorite:false, onda:false};
+		var debugTest 	= { worldSize:0.0, sectionSize: 0.0, stateOfDay:0.0, positionWorld:[0.0,0.0]};
+		var command	 	= { terrainUp: true, terrainDown:false, terremoto:false, meteorite:false, onda:false};
 		
 		//DOcument.getElementById(id) => i(id)
 		//REQUIRE ID of element, String
@@ -548,6 +548,7 @@
  
 		    var size = img.width * img.height;
 			//console.log("World size: "+size);
+			debugTest.worldSize = size;
 		    var data = new Float32Array( size );
  
 		    context.drawImage(img,0,0);
@@ -683,7 +684,7 @@
 			scene 			= new THREE.Scene();
 			camera 			= new THREE.OrthographicCamera(-window.innerWidth/64*zoom, window.innerWidth/64*zoom, window.innerHeight/44*zoom, -window.innerHeight/44*zoom, 0.01, 400);
 			touchableItem 	= new THREE.Object3D();
-			stats 			= new Stats();
+			//stats 			= new Stats();
 			renderer 		= new THREE.WebGLRenderer( {antialias: true} );
 			bussola			= new THREE.Mesh(new THREE.CylinderGeometry(1,1,0.5,32), materialBussola);
 			
@@ -696,13 +697,15 @@
 			materialGrass.uniforms.tex.value.wrapS  = THREE.RepeatWrapping;
 			materialGrass.uniforms.tex.value.wrapT  = THREE.RepeatWrapping;
 						
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top 		= '0px';
+			//stats.domElement.style.position = 'absolute';
+			//stats.domElement.style.top 		= '0px';
 			
 			esplosionMesh = new THREE.Mesh(new THREE.SphereGeometry(1,64,64), materialExplosion);
 			
 			resetCommand();
 			initiateTerrain();
+			
+			
 		}
 		
 		//Select material from heigth
@@ -760,6 +763,9 @@
 				}
 			}
 			//console.log("CropSize: "+cropWorld.children.length);
+			debugTest.sectionSize = cropWorld.children.length;
+			debugTest.position = {"0":gX, "1":gZ};
+			
 			cropWorld.position.set(-vista-0.5, 0,- vista-0.5);
 			cropWorld.rotation.y = rotateA;
 			scene.children[1].rotation.z=rotateA;
@@ -810,11 +816,11 @@
 			
 		}
 		
+		var t=0;
 		//function update
 		//update shader, sun position, time variable ( x ) and call render
 		function Update() {
 			requestAnimationFrame( Update ); 
-			//stats.update();
 			
 			sunUpdate();
 			shaderUpdate();
@@ -822,7 +828,7 @@
 			Render();
 			x=Date.now()/10000%(2*Math.PI);
 			isDay=(x>=Math.PI);
-			
+			debugTest.stateOfDay = ((x/(2*Math.PI)*24+16.5)%24);
 		}
 		
 		//update sun position and color
@@ -1308,6 +1314,14 @@
 				}else if(keyCode == 109 || keyCode == 173){
 					zoom -= 0.05;
 					onWindowResize();
+				}
+				
+				if(keyCode == 69){
+					rotateA -= Math.PI/2;
+					updateTerrainVis();
+				}else if(keyCode==81){
+					rotateA += Math.PI/2;
+					updateTerrainVis();
 				}
 				
 				

@@ -59,7 +59,9 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 
 	![Image meteora](/textures/meterora.png)
 
-sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile
+sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui centro si può vedere la mappa dela mondo modificabile.  
+Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e com + e - si effettua uno zoom
+
 
 #### Poteri
 
@@ -146,6 +148,7 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 		* meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
 	* implementato shader meteora
 	* correzione colori
+	* la mappa ruota al premere di Q(orario), E(antiorario)
 	
 #### Programmi usati
 
