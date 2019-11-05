@@ -299,6 +299,73 @@
 				gl_FragColor = vec4((color.rgb*(max(0.2,(sin(delta)/2.0)+0.5)+(vec3(max(0.,min(1.0,0.5-vPosition.z)))))),color.a);
 			}
 		</script>
+		<script id="fragmentExplosion" type="glsl/x-fragment">
+			uniform sampler2D tex;
+			uniform sampler2D texColor;
+			
+			
+			uniform float  delta;
+			
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			
+			
+
+			void main() {
+				vec4 dcolor = texture2D (tex, vUv);
+				float d = (dcolor.r) * 0.5;
+				
+				if(d*delta<-0.2) discard;
+				if(d*delta>0. && d/delta<0.3) discard;
+				
+				vec4 c = texture2D( texColor, vec2(d,0.5));
+				
+				gl_FragColor = c.rgba + c.rgba* c.a;
+				
+			}
+		</script>
+		<script id="fragmentMeteora" type="glsl/x-fragment">
+			uniform sampler2D tex;
+			uniform float delta;
+			uniform vec3 lightPos;
+
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			
+			vec3 light; 
+				
+			float random (vec2 st) {
+				return fract(sin(dot(st.xy,
+									 vec2(12.9898,78.233)))*
+					43758.5453123);
+			}
+			
+
+			void main() {
+				light =   vec3(0.9, 0.5, 0.2);
+				vec4 color = texture2D(tex, vUv);
+				vec2 st = vUv.xy;
+				
+				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
+				
+				st *= 1.0; 			
+				vec2 ipos = floor(st);  
+				vec2 fpos = fract(st);  // get the fractional coords
+				vec4 rand = vec4(random( ipos ));
+				vec4 randV= vec4(random(floor( gl_FragCoord.xy*0.25+vec2(sin(delta*2.)*5., cos(delta*2.)*5.))));
+				
+				color = randV*vec4(vec3(min(color.r, min(color.g, color.b))),1.0);
+				
+				if(color.r>0.15)
+					gl_FragColor = vec4(vec3(light),1.);
+				else
+					gl_FragColor = color*shade_factor;
+				
+			}
+			
+		</script>
 		<script id="fragmentGrass" type="glsl/x-fragment">
 			
 			uniform sampler2D tex;
@@ -376,6 +443,28 @@
 				
 			}
 		</script>
+		<script id="vertexExplosion" type="x-shader/x-vertex">
+			uniform sampler2D  tex;
+			varying vec2 vUv;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			
+			
+			uniform float delta;
+			
+			void main() {
+				vUv = uv;
+				vNormal = normal;
+				vPosition = position.xyz;
+				
+				vec4 dcolor = texture2D( tex, vUv);
+				float d = (dcolor.r);
+				
+				
+				gl_Position =   projectionMatrix * modelViewMatrix *vec4(position*(1.+delta),1.0);
+				gl_Position.xyz +=  normal*(d * delta)*0.4;
+			}
+		</script>
 		<script id="vertex" type="glsl/x-vertex">
 			
 			uniform sampler2D tex;
@@ -406,13 +495,14 @@
 		
 		var scene, renderer, stats, camera, data, sun, bussola;
 		var gX, gZ;
-		var vista, x, zoom, rotateA;
+		var vista, x, zoom, rotateA, timeEx;
 		var waveX;
 		var isRunningAction;
 		var isDay;
 		
 		var geometry;
 		var material;
+		var esplosionMesh;
 		var texture;
 		var materialSand;
 		var materialBadRock;
@@ -421,6 +511,8 @@
 		var materialGrass;
 		var materialButton;
 		var materialBussola;
+		var materialExplosion;
+		var materialMeteora;
 		
 		var cube,cropWorld;
 		var touchableItem;
@@ -561,6 +653,7 @@
 			rotateA = 0;
 			vista 	= 5;
 			waveX   = +vista+2;
+			timeEx	= 0;
 			
 			isRunningAction = false;
 			isDay			= true;
@@ -571,11 +664,14 @@
 			materialSand 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSand").innerHTML});
 			materialBadRock			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBadRock").innerHTML});
 			materialSnow 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentSnow").innerHTML});
+			materialMeteora			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentMeteora").innerHTML});
 			materialWater 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, waveX : {type:"f", value:0.0},lightPos : {type:'v3',value:new THREE.Vector3(1.0,1.0,1.0)}, delta : {type:"f", value:0.0}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexWater").innerHTML, fragmentShader:i("fragmentWater").innerHTML, transparent : true});
 			materialGrass 			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:texture}, texLato : {type:'t',value:THREE.ImageUtils.loadTexture("textures/grassLato.jpg")},LightPosition : {type:'v3',value:new THREE.Vector3()}, delta : {type:"f", value:0.0}, lightPos:{type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}, LightColor : {type:"v3", value:new THREE.Vector3(1.0,1.0,1.0)}}, vertexShader:i("vertexGrass").innerHTML, fragmentShader:i("fragmentGrass").innerHTML, transparent : true});
 			materialButton			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/arrow.png")}, alpha: {type:"f", value:0.0}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentButton").innerHTML, transparent:true});
 			materialBussola			= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaN.png")}, bacText : {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaSotto.png")}, shadText: {type:'t',value:THREE.ImageUtils.loadTexture("textures/bussolaB.png")}, alpha: {type:"f", value:Math.PI}}, vertexShader:i("vertex").innerHTML, fragmentShader:i("fragmentBussola").innerHTML, transparent:true});
-				
+			materialExplosion		= new THREE.ShaderMaterial( { uniforms: {tex : {type:'t',value:THREE.ImageUtils.loadTexture("textures/noiseExplose.png")}, texColor: {type:'t',value:THREE.ImageUtils.loadTexture("textures/colorExplsion.png")}, delta: {type:"f", value:Math.PI}}, vertexShader:i("vertexExplosion").innerHTML, fragmentShader:i("fragmentExplosion").innerHTML, transparent:true});
+					
+			
 			clWS	= true;
 			clAD	= true;
 			
@@ -602,6 +698,8 @@
 						
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top 		= '0px';
+			
+			esplosionMesh = new THREE.Mesh(new THREE.SphereGeometry(1,64,64), materialExplosion);
 			
 			resetCommand();
 			initiateTerrain();
@@ -755,6 +853,7 @@
 			materialGrass.uniforms.delta.value = x;
 			materialSnow.uniforms.delta.value = (isDay? x:x+Math.PI);
 			materialWater.uniforms.delta.value = x;
+			materialExplosion.uniforms.delta.value = (timeEx=timeEx+0.1)%3;
 			
 			materialBussola.uniforms.alpha.value = rotateA+Math.PI;
 			
@@ -825,11 +924,12 @@
 				
 				var intervallo = setInterval(function(){
 						if(stato/20>=scala){
-							clearInterval(intervallo);
 							cropWorld.position.set(0,0,0);
 							updateTerrainVis();
 							isRunningAction=false;
 							resetAllBTN();
+							resetCommand();
+							clearInterval(intervallo);
 							return;
 						}else{
 							xT = parseInt((Math.random()-0.5)*2*vista);
@@ -857,6 +957,7 @@
 							clearInterval(intervallo);
 							isRunningAction=false;
 							resetAllBTN();
+							resetCommand();
 							materialWater.uniforms.waveX.value=0;
 							return;
 						}else{
@@ -881,7 +982,7 @@
 				isRunningAction = true;
 				console.log(positione);
 				var time=0;
-				var meteora = new THREE.Mesh(geometry, material);
+				var meteora = new THREE.Mesh(geometry, materialMeteora);
 				var pos = positione.clone();
 				pos.x+=gX-0.5;
 				pos.z+=gZ-0.5;
@@ -890,9 +991,20 @@
 				
 				var intervallo = setInterval(function(){
 						if(meteora.position.y<=pos.y){
+							timeEx = 0;
+							esplosionMesh.position.set(meteora.position.x+0.5, meteora.position.y+1.5, meteora.position.z+0.5);
+							scene.add(esplosionMesh);
+							var intervalloEsplosione=setInterval(function(){
+								if(timeEx>2.5){
+									clearInterval(intervalloEsplosione);
+									scene.remove(esplosionMesh);
+									isRunningAction=false;
+									resetAllBTN();
+									resetCommand();
+								}
+								
+							}, 25);
 							clearInterval(intervallo);
-							isRunningAction=false;
-							resetAllBTN();
 							scene.remove(meteora);
 							createCratere(pos,3);
 							
@@ -915,7 +1027,8 @@
 			for(var i2=0; i2<n; i2++){
 				for(var i=-n+i2+1; i<n-i2; i++){
 					for(var iz=-n+i2+1; iz<n-i2; iz++){
-						data[(i+pos.x)+(iz+pos.z)*sqrt]-=1;
+						if(data[(i+pos.x)+(iz+pos.z)*sqrt]>1)
+							data[(i+pos.x)+(iz+pos.z)*sqrt]-=1;
 					}
 				}
 			}	

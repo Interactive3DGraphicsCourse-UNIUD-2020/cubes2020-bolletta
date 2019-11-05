@@ -140,6 +140,12 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 	* implementato orologio in alto a sinistra per fasi giorno  
 	* correzione bug di shader  
 	
+* 5/10/19
+	* bug direzione sfalsata
+	* implementato effetto esplosione con fragment e vertex, e oggetto esplosione
+		* meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
+	* implementato shader meteora
+	
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  
@@ -150,15 +156,16 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 #### Aggiunte future (modificabile)
 * aggiunta popolo che si auto gestisce
 * ottimizzazione voxel con creazione di un unica mesh anzichè tanti cubi
-* creazione shader meteora e effetto esplosione impatto (sfera che cresce e scompare)
 
 
 #### shader vari
 
-* materialBussola 	: fragmentBussola, 	vertex			
-* materialButton 	: fragmentButton,	vertex
-* materialSnow  	: fragmentSnow, 	vertex
-* materialSand		: fragmentSand, 	vertex
-* materialBadRock	: fragmentBadRock, 	vertex
-* materialWater		: fragmentWater, 	vertexWater
-* materialGrass		: fragmentGrass, 	vertexGrass
+* materialBussola 	: fragmentBussola, 		vertex			
+* materialButton 	: fragmentButton,		vertex
+* materialSnow  	: fragmentSnow, 		vertex
+* materialSand		: fragmentSand, 		vertex
+* materialBadRock	: fragmentBadRock, 		vertex
+* materialWater		: fragmentWater, 		vertexWater
+* materialGrass		: fragmentGrass, 		vertexGrass
+* materialExplosion	: fragmentExplosion, 	vertexExplosion
+* materialMeteora	: fragmentMeteora,	 	vertexMeteora
