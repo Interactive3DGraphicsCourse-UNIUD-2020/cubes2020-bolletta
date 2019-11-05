@@ -203,11 +203,11 @@
 				vec2 st = vUv.xy;
 				
 
-				st *= 15.0; 			
+				st *= 12.; 			
 				vec2 ipos = floor(st);  
 				vec2 fpos = fract(st);  // get the fractional coords
 				vec4 rand = vec4(random( ipos ));
-				vec4 randV= vec4(random(floor( gl_FragCoord.xy*0.75+vec2(sin(delta*25.0)))));
+				vec4 randV= vec4(random(floor( gl_FragCoord.xy*0.7+vec2(sin(delta*25.0)))));
 				
 				float shade_factor = 0.25 + 1.3 * max(0.0, dot(vNormal, normalize(lightPos)/1.75));
 				
@@ -215,10 +215,10 @@
 				
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
-					gl_FragColor = 1.3*shade_factor*vec4(1.0,0.75,0.1,1.0)*max(0.85,(sin(delta)+0.5));
+					gl_FragColor = 1.3*vec4(1.0,0.85,0.1,1.0)*max(0.85,(sin(delta)+0.5));
 				else{
 					gl_FragColor = color;
-					gl_FragColor = vec4(color.r*light.r+color.r/4., color.g*light.g+color.g/4., color.b*light.b +color.b/4.,1.0);
+					//gl_FragColor = vec4(color.r*light.r+color.r/4., color.g*light.g+color.g/4., color.b*light.b +color.b/4.,1.0);
 				}
 			}
 			
