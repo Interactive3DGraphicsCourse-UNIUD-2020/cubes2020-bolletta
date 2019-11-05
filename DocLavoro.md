@@ -52,6 +52,7 @@
 		meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
 		implementato shader meteora
 		correzione colori
+		la mappa ruota al premere di Q(orario), E(antiorario)
 	
 	
 		
