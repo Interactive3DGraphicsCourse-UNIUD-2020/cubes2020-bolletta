@@ -109,28 +109,28 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 
 * 1/10/19:
 	Aggiunta bottoni comando x posizione  
-		* initiateButton() : posizione  
+		* initiateButton() : posizione
 	Implementazione funzione per alzare o abassare il terreno e bottoni per controllarlo  
-		* modifyTerrainHigh(position,value) : aumenta altezza terreno in posizione position di un valore value  
-		* onDocumentMouseMove()	: per estrapolare posizione mouse  
-		* onDocumentMouseUp()   : per quando si lascia il bottone  
-		* onDocumentMouseDown() : per intercettare cosa si clicca sullo schermo  
+		* modifyTerrainHigh(position,value) : aumenta altezza terreno in posizione position di un valore value
+		* onDocumentMouseMove()	: per estrapolare posizione mouse
+		* onDocumentMouseUp()   : per quando si lascia il bottone
+		* onDocumentMouseDown() : per intercettare cosa si clicca sullo schermo
 		* initiateButton()		: add, subtruct height  
 	aggiunti btn per terremoto, tzunami(errore di alpha), meteorite(ancora non implementato)  
-		* terremotoAction()	: gestione terremoto  
-		* waveAction()		: gestione tzunami  
-		* initiateButton()  : terremoto, tzunami e meteorite  
+		* terremotoAction()	: gestione terremoto
+		* waveAction()		: gestione tzunami
+		* initiateButton()  : terremoto, tzunami e meteorite
 	rotazione con correzione di direzione e zoom in/out  
-		* initiateButton()  : +, - per lo zoom  
+		* initiateButton()  : +, - per lo zoom
 	vertexWater  tzunami ma errore alpha  
 		
 	
 * 2/10/19:
 	correzione alpha dello tzunami e suo aspetto  
 	implementazione meteorite senza texture con funzionalità del impatto  
-		* meteoraAction(positione) : gestore meteora data la posizione di dove dovra colpire  
+		* meteoraAction(positione) : gestore meteora data la posizione di dove dovra colpire
 	correzione direzione   
-		* directionAction(dir) : gestione direzioe data la rotazione (0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west)  
+		* directionAction(dir) : gestione direzioe data la rotazione (0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west)
 				
 * 3/10/19
 	aggiunta bussola con direzione  
