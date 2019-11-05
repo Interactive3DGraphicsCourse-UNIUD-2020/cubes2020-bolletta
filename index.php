@@ -215,10 +215,10 @@
 				
 				
 				if(randV.x>0.95 && rand.x>0.9 && shade_factor>0.4)
-					gl_FragColor = 1.15*shade_factor*vec4(1.0,0.75,0.1,1.0)*max(0.85,(sin(delta)+0.5));
+					gl_FragColor = 1.3*shade_factor*vec4(1.0,0.75,0.1,1.0)*max(0.85,(sin(delta)+0.5));
 				else{
 					gl_FragColor = color;
-					gl_FragColor = (gl_FragColor+vec4(light/1.5, 1.0))/2.;
+					gl_FragColor = vec4(color.r*light.r+color.r/4., color.g*light.g+color.g/4., color.b*light.b +color.b/4.,1.0);
 				}
 			}
 			

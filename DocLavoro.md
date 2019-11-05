@@ -45,7 +45,13 @@
 		Aggiunta scambio giorno notte un po netto
 		aggiunto orologio in alto a sinistra
 		correzione bug di shader
-		
+	
+	* 5/10/19
+		bug direzione sfalsata
+		implementato effetto esplosione con fragment e vertex, e oggetto esplosione
+		meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
+		implementato shader meteora
+		correzione colori
 	
 	
 		

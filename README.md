@@ -145,6 +145,7 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 	* implementato effetto esplosione con fragment e vertex, e oggetto esplosione
 		* meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
 	* implementato shader meteora
+	* correzione colori
 	
 #### Programmi usati
 
