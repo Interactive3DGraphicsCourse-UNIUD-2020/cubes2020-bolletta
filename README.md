@@ -81,64 +81,64 @@ sulla destra una bussola che indica la posizione, il tutto su un tavolo al cui c
 #### journal
 
 * 28/10/19:
-	Progettazione idea simil populous  
-	Studio funzionamento HeightMap, implementazione  
+	* Progettazione idea simil populous  
+	* Studio funzionamento HeightMap, implementazione  
 	
 * 29/10/19:
-	Implementazione del "crop" nel terreno del mondo  
-	* initiateTerrain()  :  inizializza la mappa  
-	* updateTerrainVis() :  passa alla scena solo il terreno "utile"  
-	* onDocumentKeyDown():  input della tastiera per muovere il "crop" della mappa  
-	uso della camera ortogonale  
-	resize del renderer con resize schermo  
-	* onWindowResize()   : resize view  
-	La mappa si muove al premere dei btn WASD sino al bordo  
+	* Implementazione del "crop" nel terreno del mondo  
+		* initiateTerrain()  :  inizializza la mappa  
+		* updateTerrainVis() :  passa alla scena solo il terreno "utile"  
+		* onDocumentKeyDown():  input della tastiera per muovere il "crop" della mappa  
+	* uso della camera ortogonale  
+	* resize del renderer al resize schermo  
+		* onWindowResize()   : resize view  
+	* La mappa si muove al premere dei btn WASD sino al bordo  
 
 * 30/10/19:
-	Implemetazione shader material sabbia  
-		con luccichio e ombra posizionale non trasmessa  
+	* Implemetazione shader material sabbia  
+		* con luccichio e ombra posizionale non trasmessa  
 
 * 31/10/19:
-	Implemetazione shader material erba  
-		con ombra posizionale non trasmessa e movimento  
-	Implemetazione shader material acqua  
-		con luccichio e movimento  
-	Implemetazione shader material neve  
-		con luccichio e ombra posizionale non trasmessa  
-	materiale(posY) : setta materiale in base all'altezza  
+	* Implemetazione shader material erba  
+		* con ombra posizionale non trasmessa e movimento  
+	* Implemetazione shader material acqua  
+		* con luccichio e movimento  
+	* Implemetazione shader material neve  
+		* con luccichio e ombra posizionale non trasmessa  
+	* materiale(posY) : setta materiale in base all'altezza  
 
 * 1/10/19:
-	Aggiunta bottoni comando x posizione  
-	* initiateButton() : posizione
-	Implementazione funzione per alzare o abassare il terreno e bottoni per controllarlo  
-	* modifyTerrainHigh(position,value) : aumenta altezza terreno in posizione position di un valore value
-	* onDocumentMouseMove()	: per estrapolare posizione mouse
-	* onDocumentMouseUp()   : per quando si lascia il bottone
-	* onDocumentMouseDown() : per intercettare cosa si clicca sullo schermo
-	* initiateButton()		: add, subtruct height  
-	aggiunti btn per terremoto, tzunami(errore di alpha), meteorite(ancora non implementato)  
-	* terremotoAction()	: gestione terremoto
-	* waveAction()		: gestione tzunami
-	* initiateButton()  : terremoto, tzunami e meteorite
-	rotazione con correzione di direzione e zoom in/out  
-	* initiateButton()  : +, - per lo zoom
-	vertexWater  tzunami ma errore alpha  
+	* Aggiunta bottoni comando x posizione  
+		* initiateButton() : posizione
+	* Implementazione funzione per alzare o abassare il terreno e bottoni per controllarlo  
+		* modifyTerrainHigh(position,value) : aumenta altezza terreno in posizione position di un valore value
+		* onDocumentMouseMove()	: per estrapolare posizione mouse
+		* onDocumentMouseUp()   : per quando si lascia il bottone
+		* onDocumentMouseDown() : per intercettare cosa si clicca sullo schermo
+		* initiateButton()		: add, subtruct height  
+	* aggiunti btn per terremoto, tzunami(errore di alpha), meteorite(ancora non implementato)  
+		* terremotoAction()	: gestione terremoto
+		* waveAction()		: gestione tzunami
+		* initiateButton()  : terremoto, tzunami e meteorite
+	* rotazione con correzione di direzione e zoom in/out  
+		* initiateButton()  : +, - per lo zoom
+	* vertexWater  tzunami ma errore alpha  
 		
 	
 * 2/10/19:
-	correzione alpha dello tzunami e suo aspetto  
-	implementazione meteorite senza texture con funzionalità del impatto  
-	* meteoraAction(positione) : gestore meteora data la posizione di dove dovra colpire
-	correzione direzione   
-	* directionAction(dir) : gestione direzioe data la rotazione (0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west)
+	* correzione alpha dello tzunami e suo aspetto  
+	* implementazione meteorite senza texture con funzionalità del impatto  
+		* meteoraAction(positione) : gestore meteora data la posizione di dove dovra colpire
+	* correzione direzione   
+		* directionAction(dir) : gestione direzioe data la rotazione (0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west)
 				
 * 3/10/19
-	aggiunta bussola con direzione  
+	* aggiunta bussola con direzione  
 
 * 4/10/19
-	Implemetato fasi giorno notte, con passaggio poco sfumato  
-	implementato orologio in alto a sinistra per fasi giorno  
-	correzione bug di shader  
+	* Implemetato fasi giorno notte, con passaggio poco sfumato  
+	* implementato orologio in alto a sinistra per fasi giorno  
+	* correzione bug di shader  
 	
 #### Programmi usati
 
