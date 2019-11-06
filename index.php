@@ -1389,7 +1389,6 @@
 			return Math.min(max, Math.max(val, min));
 		}
 		
-		
 		Start();
 		Update();
 			
