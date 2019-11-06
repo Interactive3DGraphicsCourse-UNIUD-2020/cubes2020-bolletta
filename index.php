@@ -485,6 +485,7 @@
 		<script src="lib/stats.min.js"></script>
 		<script src="lib/Coordinates.js"></script>
 		<script src="lib/OrbitControls.js"></script>
+		<script src="lib/GLTFLoader.js"></script>
 	</head>
 	<body>
 		<div id="Orologio">
@@ -525,6 +526,7 @@
 		
 		var debugTest 	= { worldSize:0.0, sectionSize: 0.0, stateOfDay:0.0, positionWorld:[0.0,0.0]};
 		var command	 	= { terrainUp: true, terrainDown:false, terremoto:false, meteorite:false, onda:false};
+		var Person;
 		
 		//DOcument.getElementById(id) => i(id)
 		//REQUIRE ID of element, String
@@ -688,6 +690,8 @@
 			renderer 		= new THREE.WebGLRenderer( {antialias: true} );
 			bussola			= new THREE.Mesh(new THREE.CylinderGeometry(1,1,0.5,32), materialBussola);
 			
+			Person = loading("models/Person.gltf");
+			
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x040404 );
 			renderer.shadowMapEnabled 		 = true;																			
@@ -740,8 +744,8 @@
 		//update terrain for updating
 		function updateTerrainVis(){
 			
-			cube = new THREE.Mesh( geometry, material );
-			cropWorld = new THREE.Object3D();
+			cube 		    = new THREE.Mesh( geometry, material );
+			cropWorld	    = new THREE.Object3D();
 			if(data!=null){
 				var sqrt = Math.sqrt(data.length);
 				var iniX = Math.max(0,gX-vista), iniZ = Math.max(0,gZ-vista);
@@ -750,6 +754,7 @@
 				for(var ix=iniX; ix<maxX; ix++){
 					for(var iz=iniZ; iz<maxZ; iz++){
 						for(var i2=0; i2<data[ix+iz*sqrt]; i2++){	
+								
 								cube = materiale(i2);
 								
 								cube.position.set((ix-gX+0.5), i2, (iz-gZ+0.5));
@@ -825,6 +830,8 @@
 			sunUpdate();
 			shaderUpdate();
 			
+			Person.update();
+						
 			Render();
 			x=Date.now()/10000%(2*Math.PI);
 			isDay=(x>=Math.PI);
@@ -1388,6 +1395,143 @@
 		function lim(val, min, max){
 			return Math.min(max, Math.max(val, min));
 		}
+		
+		
+				
+		//Read Armature of model
+		//REQUIRE root bone(at begin model)
+		//REQUIRE s array with other bone
+		//RETURN Armature
+		function ricorso(root, s){
+			s[root.name] = root;
+			
+			if(root.children.length>0)
+				for(var i=0; i<root.children.length; i++){
+					s=ricorso(root.children[i],s);
+				}
+			return s;
+		}
+		
+		//Create Armature
+		//REQUIRE root model
+		//RETURN Armature
+		function MappaOssatura(root){
+			var Armatura = { head: null, armL:null, armR:null, handL:null, handR:null, legL:null, legR:null};
+			
+			return ricorso(root, {});
+		}
+		
+		//Read model
+		//REQUIRE path position
+		//!!Add to scene the Object
+		function loading(path){
+			var loader = new THREE.GLTFLoader(); 
+			
+			loader.load(path,
+					function (gltf){
+						var modello = {model:null, material:Array(), armature:Array()};
+	
+						console.info(gltf);
+					
+						modello.model = gltf.scene.children[0];
+						
+						console.log(modello.model.children[4]);
+						
+						modello.material.push(modello.model.children[4].material);
+						modello.castShadow = true;
+						modello.receiveShadow = true;
+						modello.material[0].normalScale = {x:0.5, y:0.5};
+						modello.material[0].metalness = 0;
+						
+						
+						modello.armature = MappaOssatura(modello.model);
+						console.info(modello);
+						Person = Entity(modello);
+						
+						scene.add(Person.Mesh.model);
+						
+						
+						
+					}, undefined, function (error){
+						console.error(error);
+					});
+			}
+			
+			
+			//Oggetto Del Camminatore errante
+			//REQUIRE model mesh del camminatore
+			//RETURN obj{ Mesh::mesh del camminatore, positionData: posizione del camminatore, update()::funzione di aggiornamento}
+			function Entity(model){
+				model.model.scale.set(0.3,0.6,0.3);
+				var modello = model;
+				var sqrt = Math.sqrt(data.length);
+				var pos =  {"0":0,"1":0,"2":0};
+				var dire = function(d){
+					var x=0,z=0,yr=0;
+					switch(d){
+						case 0:
+							z--;
+							yr=Math.PI/2;
+							break;
+						case 1:
+							x--;
+							yr=Math.PI;
+							break;
+						case 2:
+							z++;
+							yr=-Math.PI/2;
+							break;
+						case 3:
+							x++;
+							yr=0;
+							break;
+					}
+					return {"x":x, "z":z, "yR":yr};
+				};
+				
+				
+				var timeMove = setInterval(
+					function(){
+						var dir = dire(parseInt(Math.random()*4));
+						var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
+						if(newPos[0]+ pos[0]<0 || newPos[0]+ pos[0]>sqrt || newPos[2]+ pos[2]<0 || newPos[2]+ pos[2]>sqrt || data[(newPos[0]+ pos[0])+(newPos[2]+ pos[2])*sqrt]<2){
+							return;
+						}else{
+							 modello.model.rotation.y = dir["yR"];
+							 //console.log(modello.model.rotation); 
+							var tt=0;
+							var intervalloAnimazione = setInterval(function(){
+								if(tt>10){
+									clearInterval(intervalloAnimazione);
+									
+									return;
+								}else{								
+									pos[0] = (newPos[0]/9+ pos[0]);
+									pos[2] = (newPos[2]/9+ pos[2]);
+									}
+								tt++;
+								
+							}, 200);
+						}
+						
+									
+					},2500);
+						
+				
+				return { Mesh : modello,
+				positionData : pos,
+				update:function(){
+					if(pos[0]<Math.max(0, gX-vista) || pos[0]>Math.min(sqrt, gX+vista-0.5) || pos[2]<Math.max(0, gZ-vista) || pos[2]>Math.min(sqrt, gZ+vista-0.5))
+						cropWorld.remove(modello.model);
+					else 
+						cropWorld.add(modello.model);
+					
+					pos[1] = data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1;
+					modello.model.position.set((pos[0]-gX),pos[1],pos[2]-gZ);
+				}};
+				
+			}
+			
 		
 		Start();
 		Update();

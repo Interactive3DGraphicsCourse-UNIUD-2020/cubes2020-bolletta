@@ -149,7 +149,9 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* implementato shader meteora
 	* correzione colori
 	* la mappa ruota al premere di Q(orario), E(antiorario)
-	
+* 6/10/19:
+	* implementato camminatore errante nella mappa	
+
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  
@@ -158,7 +160,6 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 * server Web Apache ver: 2.4  
 
 #### Aggiunte future (modificabile)
-* aggiunta popolo che si auto gestisce
 * ottimizzazione voxel con creazione di un unica mesh anzichè tanti cubi
 
 

@@ -54,5 +54,6 @@
 		correzione colori
 		la mappa ruota al premere di Q(orario), E(antiorario)
 	
-	
+	* 6/10/19:
+		implementato camminatore errante nella mappa
 		
