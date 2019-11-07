@@ -246,15 +246,6 @@
     "materials" : [
         {
             "doubleSided" : true,
-			"emissiveFactor" : [
-                0.2,
-                0.2,
-                0.2
-            ],
-			"emissiveTexture" : {
-                "index" : 0,
-                "texCoord" : 0
-            },
             "name" : "Material",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
@@ -320,7 +311,7 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 226,
+            "count" : 294,
             "max" : [
                 0.5598337650299072,
                 2.4947803020477295,
@@ -336,31 +327,31 @@
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 226,
+            "count" : 294,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 226,
+            "count" : 294,
             "type" : "VEC2"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 226,
+            "count" : 294,
             "type" : "VEC4"
         },
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 226,
+            "count" : 294,
             "type" : "VEC4"
         },
         {
             "bufferView" : 5,
             "componentType" : 5123,
-            "count" : 384,
+            "count" : 480,
             "type" : "SCALAR"
         },
         {
@@ -373,43 +364,43 @@
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 2712,
+            "byteLength" : 3528,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 2712,
-            "byteOffset" : 2712
+            "byteLength" : 3528,
+            "byteOffset" : 3528
         },
         {
             "buffer" : 0,
-            "byteLength" : 1808,
-            "byteOffset" : 5424
+            "byteLength" : 2352,
+            "byteOffset" : 7056
         },
         {
             "buffer" : 0,
-            "byteLength" : 1808,
-            "byteOffset" : 7232
+            "byteLength" : 2352,
+            "byteOffset" : 9408
         },
         {
             "buffer" : 0,
-            "byteLength" : 3616,
-            "byteOffset" : 9040
+            "byteLength" : 4704,
+            "byteOffset" : 11760
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 960,
+            "byteOffset" : 16464
         },
         {
             "buffer" : 0,
             "byteLength" : 768,
-            "byteOffset" : 12656
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 768,
-            "byteOffset" : 13424
+            "byteOffset" : 17424
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 14192,
+            "byteLength" : 18192,
             "uri" : "Person.bin"
         }
     ]

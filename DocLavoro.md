@@ -57,3 +57,7 @@
 	* 6/10/19:
 		implementato camminatore errante nella mappa
 		
+	* 7/11/19:
+		implementata animazione camminatore errante
+		aggiunto bottone per centrare il camminatore
+		

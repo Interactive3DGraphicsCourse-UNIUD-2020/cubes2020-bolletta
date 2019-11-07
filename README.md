@@ -31,9 +31,13 @@ terremoto, lo tzunami e la meteorite.
 
 L' interfaccia si compone di un tastierino sulla sinistra con le seguenti feature dal alto-sinistro muovendosi per righe crescenti:
 	
-* 9 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
+* 8 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
 
 	![Image arrow](/textures/arrow.png)
+	
+* bottone per trovare il Camminatore Errante
+
+	![Image arrow](/textures/punto.png)
 
 * 2 bottoni per gestire l'altezza terreno
 
@@ -149,9 +153,14 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* implementato shader meteora
 	* correzione colori
 	* la mappa ruota al premere di Q(orario), E(antiorario)
+	
 * 6/10/19:
 	* implementato camminatore errante nella mappa	
 
+* 7/11/19:
+	* implementata animazione camminatore errante
+	* aggiunto bottone per centrare il camminatore
+		
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  

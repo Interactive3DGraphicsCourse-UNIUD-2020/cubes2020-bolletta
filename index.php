@@ -780,7 +780,7 @@
 		//Main function
 		//create sea and table and bussola
 		function Start() {			
-			var ambient =  new THREE.DirectionalLight(0xffffaa, 0.5);
+			var ambient =  new THREE.DirectionalLight(0xaaaaaa, 1);
 			
 			initiate();
 			
@@ -797,6 +797,8 @@
 			scene.add(sun);
 			scene.add(ambient);
 			
+			
+			ambient.position.set(10, 5,10);
 			
 			camera.position.set(-1, 12, -1);
 			camera.rotation.set(-1.137, 0.398, 0.666);
@@ -830,6 +832,7 @@
 			sunUpdate();
 			shaderUpdate();
 			
+			//Update del camminatore
 			Person.update();
 						
 			Render();
@@ -1049,6 +1052,13 @@
 			updateTerrainVis();
 		}
 		
+		//Va a visualizzare con la camera il camminatore
+		//!!modifica posizione gX gZ
+		function puntaCamminatore(){
+			gX = Person.positionData[0];
+			gZ = Person.positionData[0];
+		}
+		
 		//manage button click(left world button)
 		//require position of button world axis
 		function buttonAction(action){
@@ -1075,6 +1085,9 @@
 					switch(action.position.z){
 						case 0:
 							directionAction(2);
+							break;
+						case 1:
+							puntaCamminatore();
 							break;
 						case 2:
 							directionAction(6);
@@ -1458,80 +1471,93 @@
 			}
 			
 			
-			//Oggetto Del Camminatore errante
-			//REQUIRE model mesh del camminatore
-			//RETURN obj{ Mesh::mesh del camminatore, positionData: posizione del camminatore, update()::funzione di aggiornamento}
-			function Entity(model){
-				model.model.scale.set(0.3,0.6,0.3);
-				var modello = model;
-				var sqrt = Math.sqrt(data.length);
-				var pos =  {"0":0,"1":0,"2":0};
-				var dire = function(d){
-					var x=0,z=0,yr=0;
-					switch(d){
-						case 0:
-							z--;
-							yr=Math.PI/2;
-							break;
-						case 1:
-							x--;
-							yr=Math.PI;
-							break;
-						case 2:
-							z++;
-							yr=-Math.PI/2;
-							break;
-						case 3:
-							x++;
-							yr=0;
-							break;
-					}
-					return {"x":x, "z":z, "yR":yr};
-				};
-				
-				
-				var timeMove = setInterval(
-					function(){
-						var dir = dire(parseInt(Math.random()*4));
-						var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
-						if(newPos[0]+ pos[0]<0 || newPos[0]+ pos[0]>sqrt || newPos[2]+ pos[2]<0 || newPos[2]+ pos[2]>sqrt || data[(newPos[0]+ pos[0])+(newPos[2]+ pos[2])*sqrt]<2){
-							return;
-						}else{
-							 modello.model.rotation.y = dir["yR"];
-							 //console.log(modello.model.rotation); 
-							var tt=0;
-							var intervalloAnimazione = setInterval(function(){
-								if(tt>10){
-									clearInterval(intervalloAnimazione);
-									
-									return;
-								}else{								
-									pos[0] = (newPos[0]/9+ pos[0]);
-									pos[2] = (newPos[2]/9+ pos[2]);
-									}
-								tt++;
-								
-							}, 200);
-						}
-						
-									
-					},2500);
-						
-				
-				return { Mesh : modello,
-				positionData : pos,
-				update:function(){
-					if(pos[0]<Math.max(0, gX-vista) || pos[0]>Math.min(sqrt, gX+vista-0.5) || pos[2]<Math.max(0, gZ-vista) || pos[2]>Math.min(sqrt, gZ+vista-0.5))
-						cropWorld.remove(modello.model);
-					else 
-						cropWorld.add(modello.model);
-					
-					pos[1] = data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1;
-					modello.model.position.set((pos[0]-gX),pos[1],pos[2]-gZ);
-				}};
-				
-			}
+		//Oggetto Del Camminatore errante
+		//REQUIRE model mesh del camminatore
+		//RETURN obj{ Mesh::mesh del camminatore, positionData: posizione del camminatore, update()::funzione di aggiornamento}
+		//!!Crea due intervall : uno che dura per tutto il tempo e calcola la posizione  ogni 2500ms,
+		//      il secondo per l'animaione ogni 200ms, rimosso al termine dell'animazione
+		function Entity(model){
+			model.model.scale.set(0.3,0.6,0.3);
+			var modello = model;
+			var sqrt = Math.sqrt(data.length);
+			var pos =  {"0":5,"1":0,"2":5};
+			var dire = function(d){
+				var x=0,z=0,yr=0;
+				switch(d){
+					case 0:
+						z--;
+						yr=Math.PI/2;
+						break;
+					case 1:
+						x--;
+						yr=Math.PI;
+						break;
+					case 2:
+						z++;
+						yr=-Math.PI/2;
+						break;
+					case 3:
+						x++;
+						yr=0;
+						break;
+					default:
+						break;
+				}
+				return {"x":x, "z":z, "yR":yr};
+			};
 			
+			
+			var timeMove = setInterval(
+				function(){
+					var dir = dire(parseInt(Math.random()*5));
+					var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
+					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[(newPos[0]+ pos[0])+(newPos[2]+ pos[2])*sqrt]<2)){
+						
+						 modello.model.rotation.y = dir["yR"];
+						 //console.log(modello.model.rotation); 
+						var tt=0;
+						var intervalloAnimazione = setInterval(function(){
+							if(tt>15 || (newPos[0]==0 && newPos[2]==0)){
+								clearInterval(intervalloAnimazione);
+								
+								modello.armature.LL.rotation.z = 0;
+								modello.armature.LLH.rotation.z = 0;
+								modello.armature.LR.rotation.z = 0;
+								modello.armature.LRH.rotation.z = Math.PI;
+								
+								return;
+							}else{								
+								pos[0] = (newPos[0]/14+ pos[0]);
+								pos[2] = (newPos[2]/14+ pos[2]);
+								var v=Math.PI/3*tt;
+								modello.armature.LL.rotation.z = (-(Math.sin(v))<0? Math.abs(Math.sin(v)):0)/2;
+								modello.armature.LLH.rotation.z = -(Math.sin(v))/2;
+								modello.armature.LR.rotation.z = ((Math.PI-(Math.cos(v)))<Math.PI? Math.abs(Math.cos(v)):0)/2;
+								modello.armature.LRH.rotation.z = Math.PI-(Math.cos(v))/2;
+								}
+							tt++;
+							
+						}, 100);
+					}
+					
+								
+				},2500);
+					
+			
+			return { Mesh : modello,
+			positionData : pos,
+			update:function(){
+				if(pos[0]<Math.max(0, gX-vista) || pos[0]>Math.min(sqrt, gX+vista-0.5) || pos[2]<Math.max(0, gZ-vista) || pos[2]>Math.min(sqrt, gZ+vista-0.5))
+					cropWorld.remove(modello.model);
+				else 
+					cropWorld.add(modello.model);
+				
+				pos[1] = Math.floor(data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1);
+				modello.model.position.set((pos[0]-gX),pos[1]+0.3,pos[2]-gZ);
+			}};
+			
+		}
+		
 		
 		Start();
 		Update();
