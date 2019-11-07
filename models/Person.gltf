@@ -284,7 +284,7 @@
         {
             "mimeType" : "image/png",
             "name" : "person",
-            "uri" : "person.png"
+            "uri" : "../textures/person.png"
         }
     ],
     "skins" : [

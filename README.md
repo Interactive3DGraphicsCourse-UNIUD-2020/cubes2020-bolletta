@@ -33,7 +33,7 @@ L' interfaccia si compone di un tastierino sulla sinistra con le seguenti featur
 	
 * 8 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
 	
-	<img src="/textures/arrow.png" alt="drawing" width="200" style="transform : rotate(90deg)"/>
+	![Image arrow](/textures/arrows.png)
 	
 * bottone per trovare il Camminatore Errante
 
@@ -160,6 +160,8 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 * 7/11/19:
 	* implementata animazione camminatore errante
 	* aggiunto bottone per centrare il camminatore
+		* puntaCamminatore() : sposta il cropWorld per mostrare il camminatore
+	* correzione movimento camminatore (no in acqua e no camminata oltre 2 blocchi altezza)
 		
 #### Programmi usati
 

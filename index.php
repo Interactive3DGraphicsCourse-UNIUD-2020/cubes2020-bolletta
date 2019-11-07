@@ -1055,8 +1055,8 @@
 		//Va a visualizzare con la camera il camminatore
 		//!!modifica posizione gX gZ
 		function puntaCamminatore(){
-			gX = Person.positionData[0];
-			gZ = Person.positionData[0];
+			gX = Math.floor(Person.positionData[0]);
+			gZ = Math.floor(Person.positionData[2]);
 		}
 		
 		//manage button click(left world button)
@@ -1444,11 +1444,11 @@
 					function (gltf){
 						var modello = {model:null, material:Array(), armature:Array()};
 	
-						console.info(gltf);
+						//console.info(gltf);
 					
 						modello.model = gltf.scene.children[0];
 						
-						console.log(modello.model.children[4]);
+						//console.log(modello.model.children[4]);
 						
 						modello.material.push(modello.model.children[4].material);
 						modello.castShadow = true;
@@ -1458,7 +1458,7 @@
 						
 						
 						modello.armature = MappaOssatura(modello.model);
-						console.info(modello);
+						//console.info(modello);
 						Person = Entity(modello);
 						
 						scene.add(Person.Mesh.model);
@@ -1511,7 +1511,7 @@
 				function(){
 					var dir = dire(parseInt(Math.random()*5));
 					var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
-					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[(newPos[0]+ pos[0])+(newPos[2]+ pos[2])*sqrt]<2)){
+					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<2 || Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])>1.5)){
 						
 						 modello.model.rotation.y = dir["yR"];
 						 //console.log(modello.model.rotation); 
@@ -1554,6 +1554,7 @@
 				
 				pos[1] = Math.floor(data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1);
 				modello.model.position.set((pos[0]-gX),pos[1]+0.3,pos[2]-gZ);
+				
 			}};
 			
 		}
