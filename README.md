@@ -161,7 +161,7 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* implementata animazione camminatore errante
 	* aggiunto bottone per centrare il camminatore
 		* puntaCamminatore() : sposta il cropWorld per mostrare il camminatore
-	* correzione movimento camminatore (no in acqua e no camminata oltre 2 blocchi altezza)
+	* correzione movimento camminatore ("no in acqua" e no camminata oltre 2 blocchi altezza)
 		
 #### Programmi usati
 

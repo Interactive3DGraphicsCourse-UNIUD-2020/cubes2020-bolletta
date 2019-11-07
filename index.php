@@ -1511,7 +1511,7 @@
 				function(){
 					var dir = dire(parseInt(Math.random()*5));
 					var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
-					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<2 || Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])>1.5)){
+					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<2.5 || Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])>1.25)){
 						
 						 modello.model.rotation.y = dir["yR"];
 						 //console.log(modello.model.rotation); 
@@ -1547,12 +1547,12 @@
 			return { Mesh : modello,
 			positionData : pos,
 			update:function(){
+				pos[1] = Math.floor(data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1);
 				if(pos[0]<Math.max(0, gX-vista) || pos[0]>Math.min(sqrt, gX+vista-0.5) || pos[2]<Math.max(0, gZ-vista) || pos[2]>Math.min(sqrt, gZ+vista-0.5))
 					cropWorld.remove(modello.model);
 				else 
 					cropWorld.add(modello.model);
 				
-				pos[1] = Math.floor(data[Math.floor( pos[0])+Math.floor(pos[2])*sqrt]+1);
 				modello.model.position.set((pos[0]-gX),pos[1]+0.3,pos[2]-gZ);
 				
 			}};
