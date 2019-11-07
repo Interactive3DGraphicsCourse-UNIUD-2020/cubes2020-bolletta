@@ -61,5 +61,5 @@
 		implementata animazione camminatore errante
 		aggiunto bottone per centrare il camminatore
 		correzione movimento camminatore (no in acqua e no camminata oltre 2 blocchi altezza)
-		
+		implementato un loadState per controllare lo stato del caricamento
 		

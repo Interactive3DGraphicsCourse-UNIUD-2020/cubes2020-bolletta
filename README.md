@@ -162,7 +162,8 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* aggiunto bottone per centrare il camminatore
 		* puntaCamminatore() : sposta il cropWorld per mostrare il camminatore
 	* correzione movimento camminatore ("no in acqua" e no camminata oltre 2 blocchi altezza)
-		
+	* implementato un loadState per controllare lo stato del caricamento
+	
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  

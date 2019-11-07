@@ -500,6 +500,7 @@
 		var waveX;
 		var isRunningAction;
 		var isDay;
+		var loadState;
 		
 		var geometry;
 		var material;
@@ -643,6 +644,7 @@
 				//get height data from img
 				data = getHeightData(img,0.03);
 				updateTerrainVis();
+				loadState++;
 			}
 		}
 		
@@ -652,11 +654,12 @@
 			gX 	= 5;
 			gZ  = 5;
 			x   = 0;
-			zoom    = 1;
-			rotateA = 0;
-			vista 	= 5;
-			waveX   = +vista+2;
-			timeEx	= 0;
+			zoom     = 1;
+			rotateA  = 0;
+			vista 	 = 5;
+			waveX    = +vista+2;
+			timeEx	 = 0;
+			loadState= 0;
 			
 			isRunningAction = false;
 			isDay			= true;
@@ -779,6 +782,7 @@
 	
 		//Main function
 		//create sea and table and bussola
+		//!!create a intereval to manage the loadState for lunching update()!!
 		function Start() {			
 			var ambient =  new THREE.DirectionalLight(0xaaaaaa, 1);
 			
@@ -821,6 +825,15 @@
 			initiateButton();
 			onWindowResize();
 			
+			var intervalloLoad = setInterval(function(){
+				console.log("Stato: "+(loadState*50));
+				if(loadState==2){
+					clearInterval(intervalloLoad);
+					
+					Update();
+				}
+				
+			}, 1000);
 		}
 		
 		var t=0;
@@ -1463,7 +1476,7 @@
 						
 						scene.add(Person.Mesh.model);
 						
-						
+						loadState++;
 						
 					}, undefined, function (error){
 						console.error(error);
@@ -1561,7 +1574,6 @@
 		
 		
 		Start();
-		Update();
 			
 		</script>
 	</body>
