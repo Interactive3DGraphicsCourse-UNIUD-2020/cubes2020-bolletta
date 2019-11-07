@@ -32,8 +32,8 @@ terremoto, lo tzunami e la meteorite.
 L' interfaccia si compone di un tastierino sulla sinistra con le seguenti feature dal alto-sinistro muovendosi per righe crescenti:
 	
 * 8 bottoni direzionali per muoversi nelle varie direzione (se fine mappa non si muove)
-
-	![Image arrow](/textures/arrow.png)
+	
+	<img src="/textures/arrow.png" alt="drawing" width="200" style="transform : rotate(90deg)"/>
 	
 * bottone per trovare il Camminatore Errante
 
