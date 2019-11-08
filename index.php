@@ -126,9 +126,9 @@
 					if(vPosition.x<-0.4999 || vPosition.x>0.4999)
 						gl_FragColor = vec4(vec3((1.0-abs(vPosition.z))),1.0);
 					else if(vPosition.z<-0.4999 || vPosition.z>0.4999)
-						gl_FragColor = vec4(vec3((1.0-abs(vPosition.x))),1.0)*shaderFactor;
+						gl_FragColor = vec4(vec3((1.0-abs(vPosition.x)))*shaderFactor,1.0);
 					else
-						gl_FragColor = colorBase;
+						gl_FragColor = vec4(colorBase.rgb, 1.0);
 			}
 			
 		</script>

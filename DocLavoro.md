@@ -63,3 +63,7 @@
 		correzione movimento camminatore (no in acqua e no camminata oltre 2 blocchi altezza)
 		implementato un loadState per controllare lo stato del caricamento
 		
+	* 8/10/19:
+		Corretto combattimento sulla Z tra table e i bottoni
+		ritocco di alcune texture
+		
