@@ -46,6 +46,7 @@
 		}
 	
 	</style>
+
 		<script id="fragmentBussola" type="glsl/x-fragment">
 			float PI = 3.1415926535897932384626433832795;
 			
@@ -807,7 +808,7 @@
 			camera.position.set(-1, 12, -1);
 			camera.rotation.set(-1.137, 0.398, 0.666);
 			
-			var sea = new THREE.Mesh(new THREE.PlaneGeometry(vista*2+2,vista*2+2,320,320), materialWater);
+			var sea   = new THREE.Mesh(new THREE.PlaneGeometry(vista*2+2,vista*2+2,320,320), materialWater);
 			var table = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture("textures/table_alpha.png"),transparent:true}));
 			
 			
@@ -1493,7 +1494,7 @@
 			model.model.scale.set(0.3,0.6,0.3);
 			var modello = model;
 			var sqrt = Math.sqrt(data.length);
-			var pos =  {"0":5,"1":0,"2":5};
+			var pos =  {"0":parseInt(Math.random()*sqrt),"1":0,"2":parseInt(Math.random()*sqrt)};
 			var dire = function(d){
 				var x=0,z=0,yr=0;
 				switch(d){
@@ -1524,8 +1525,11 @@
 				function(){
 					var dir = dire(parseInt(Math.random()*5));
 					var newPos = {"0":dir["x"],"1": 0,"2": dir["z"]};
-					if(!(newPos[0]+ pos[0]<0.2 || newPos[0]+ pos[0]>sqrt-0.2 || newPos[2]+ pos[2]<0.2 || newPos[2]+ pos[2]>sqrt-0.2 || data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<2.5 || Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])>1.25)){
-						
+					if(newPos[0]+ pos[0]>0.2 && newPos[0]+ pos[0]<sqrt-0.2 	&& 
+						newPos[2]+ pos[2]>0.2 && newPos[2]+ pos[2]<sqrt-0.2 && 
+						data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]>=2 && 
+						Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])<1.5){
+						  
 						 modello.model.rotation.y = dir["yR"];
 						 //console.log(modello.model.rotation); 
 						var tt=0;
@@ -1551,6 +1555,11 @@
 							tt++;
 							
 						}, 100);
+					}else{
+						if(data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<3){
+							pos =  {"0":parseInt(Math.random()*sqrt),"1":0,"2":parseInt(Math.random()*sqrt)};
+						}
+							
 					}
 					
 								
