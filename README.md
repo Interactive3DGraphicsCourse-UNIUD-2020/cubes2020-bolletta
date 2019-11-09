@@ -21,6 +21,10 @@ form of a greyscale image as input;
 In either case, see the next sections for more detailed instructions and suggestions. You are also required to document your
 work and write a final report, as detailed below. 
 
+## Avvertenze
+	
+	Su Opera non si garantisce il corretto funzionamento del puntatore del mouse.
+	Su chrome e firefox si garantisce il funzionamento del puntatore del mouse se gli fps sono maggiori di 15.
 
 ## Report
 
@@ -113,7 +117,7 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 		* con luccichio e ombra posizionale non trasmessa  
 	* materiale(posY) : setta materiale in base all'altezza  
 
-* 1/10/19:
+* 1/11/19:
 	* Aggiunta bottoni comando x posizione  
 		* initiateButton() : posizione
 	* Implementazione funzione per alzare o abassare il terreno e bottoni per controllarlo  
@@ -131,22 +135,22 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* vertexWater  tzunami ma errore alpha  
 		
 	
-* 2/10/19:
+* 2/11/19:
 	* correzione alpha dello tzunami e suo aspetto  
 	* implementazione meteorite senza texture con funzionalità del impatto  
 		* meteoraAction(positione) : gestore meteora data la posizione di dove dovra colpire
 	* correzione direzione   
 		* directionAction(dir) : gestione direzioe data la rotazione (0 = north, 1 = north-est, 2 = est, ... , 6 = west, 7 = nort-west)
 				
-* 3/10/19
+* 3/11/19
 	* aggiunta bussola con direzione  
 
-* 4/10/19
+* 4/11/19
 	* Implemetato fasi giorno notte, con passaggio poco sfumato  
 	* implementato orologio in alto a sinistra per fasi giorno  
 	* correzione bug di shader  
 	
-* 5/10/19
+* 5/11/19
 	* bug direzione sfalsata
 	* implementato effetto esplosione con fragment e vertex, e oggetto esplosione
 		* meteoraAction(positione) : crea anche l'intervallo per gestire l'animazione delle esplosioni
@@ -154,7 +158,7 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* correzione colori
 	* la mappa ruota al premere di Q(orario), E(antiorario)
 	
-* 6/10/19:
+* 6/11/19:
 	* implementato camminatore errante nella mappa	
 		* Entity(model) : crea il un entity dato un modello (Mesh+Armature)
 
@@ -165,10 +169,14 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 	* correzione movimento camminatore ("no in acqua" e no camminata oltre 2 blocchi altezza)
 	* implementato un loadState per controllare lo stato del caricamento
 	
-* 8/10/19:
+* 8/11/19:
 	* Corretto combattimento sulla Z tra table e i bottoni
 	* ritocco di alcune texture
 	
+* 9/11/19:
+	* correzione bug posizione meteora alla rotazione della mappa
+	* correzione teletrasporto Camminatore Errante in caso di caduta in acqua
+
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  

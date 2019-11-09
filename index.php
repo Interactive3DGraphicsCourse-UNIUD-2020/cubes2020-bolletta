@@ -655,7 +655,7 @@
 			gX 	= 5;
 			gZ  = 5;
 			x   = 0;
-			zoom     = 1;
+			zoom     = 1.5;
 			rotateA  = 0;
 			vista 	 = 5;
 			waveX    = +vista+2;
@@ -1015,10 +1015,16 @@
 				var time=0;
 				var meteora = new THREE.Mesh(geometry, materialMeteora);
 				var pos = positione.clone();
+				var piv = new THREE.Object3D();
 				pos.x+=gX-0.5;
 				pos.z+=gZ-0.5;
-				meteora.position.set(positione.x-vista-0.5,15, positione.z-vista-0.5);
-				scene.add(meteora);
+				//console.log(positione);
+				
+				meteora.position.set((positione.x),15, (positione.z));
+				piv.position.set(-vista-0.5, 0,- vista-0.5)
+				piv.add(meteora);
+				piv.rotation.y = rotateA;
+				scene.add(piv);
 				
 				var intervallo = setInterval(function(){
 						if(meteora.position.y<=pos.y){
@@ -1036,7 +1042,7 @@
 								
 							}, 25);
 							clearInterval(intervallo);
-							scene.remove(meteora);
+							scene.remove(piv);
 							createCratere(pos,3);
 							
 							return;
@@ -1555,14 +1561,24 @@
 							tt++;
 							
 						}, 100);
+						modello.model.position.set((pos[0]-gX),pos[1]+0.3,pos[2]-gZ);
 					}else{
-						if(data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<3){
-							pos =  {"0":parseInt(Math.random()*sqrt),"1":0,"2":parseInt(Math.random()*sqrt)};
+						if(data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]<2){
+							clearInterval(timeMove);
+							clearInterval(intervalloAnimazione);
+							var timeE=0;
+							var teleportIntervall = setInterval(function(){
+								if(timeE>10){
+									clearInterval(teleportIntervall);
+									Person = Person.reset(model);
+								}else{
+									modello.model.rotation.y+=Math.PI/4;
+								}
+								timeE++;
+							}, 50);
 						}
-							
 					}
 					
-								
 				},2500);
 					
 			
@@ -1577,6 +1593,8 @@
 				
 				modello.model.position.set((pos[0]-gX),pos[1]+0.3,pos[2]-gZ);
 				
+			},reset:function(){
+				return Entity(model);
 			}};
 			
 		}
