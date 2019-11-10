@@ -176,7 +176,11 @@ Premendo WASD si va a interagire con la posizione mentre con Q ed E si ruota e c
 * 9/11/19:
 	* correzione bug posizione meteora alla rotazione della mappa
 	* correzione teletrasporto Camminatore Errante in caso di caduta in acqua
-
+	
+* 10/11/19:
+	* correzione bug posizione meteora al spostamento e rotazione durante la sua animazione
+	* correzione limite scalino altezza Camminatore Errante
+ 	
 #### Programmi usati
 
 * immagini e texture Paint.net ver: 4.205  

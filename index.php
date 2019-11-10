@@ -487,6 +487,7 @@
 		<script src="lib/Coordinates.js"></script>
 		<script src="lib/OrbitControls.js"></script>
 		<script src="lib/GLTFLoader.js"></script>
+		<script src="lib/postprocessing.min.js"></script>
 	</head>
 	<body>
 		<div id="Orologio">
@@ -822,7 +823,7 @@
 			
 			bussola.position.set(2.5, 3, -2*vista-2.5);
 			scene.add(bussola);
-			
+						
 			initiateButton();
 			onWindowResize();
 			
@@ -1016,6 +1017,7 @@
 				var meteora = new THREE.Mesh(geometry, materialMeteora);
 				var pos = positione.clone();
 				var piv = new THREE.Object3D();
+				var scos= new THREE.Vector3(gX, 0 , gZ);
 				pos.x+=gX-0.5;
 				pos.z+=gZ-0.5;
 				//console.log(positione);
@@ -1048,6 +1050,9 @@
 							return;
 						}else{
 							meteora.position.y-=time;
+							meteora.position.x =positione.x+scos.x-gX;
+							meteora.position.z =positione.z+scos.z-gZ;
+							piv.rotation.y = rotateA;
 							time+=0.25;
 						}		
 					},100);
@@ -1494,8 +1499,9 @@
 		//Oggetto Del Camminatore errante
 		//REQUIRE model mesh del camminatore
 		//RETURN obj{ Mesh::mesh del camminatore, positionData: posizione del camminatore, update()::funzione di aggiornamento}
-		//!!Crea due intervall : uno che dura per tutto il tempo e calcola la posizione  ogni 2500ms,
+		//!!Crea tre intervall : uno che dura per tutto il tempo e calcola la posizione  ogni 2500ms,
 		//      il secondo per l'animaione ogni 200ms, rimosso al termine dell'animazione
+		//		il terzo per l'animazione di teletrasporto
 		function Entity(model){
 			model.model.scale.set(0.3,0.6,0.3);
 			var modello = model;
@@ -1534,7 +1540,7 @@
 					if(newPos[0]+ pos[0]>0.2 && newPos[0]+ pos[0]<sqrt-0.2 	&& 
 						newPos[2]+ pos[2]>0.2 && newPos[2]+ pos[2]<sqrt-0.2 && 
 						data[parseInt((newPos[0]+ pos[0]))+parseInt((newPos[2]+ pos[2]))*sqrt]>=2 && 
-						Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])<1.5){
+						Math.abs(data[parseInt(pos[0])+parseInt(pos[2])*sqrt]-data[parseInt(newPos[0]+ pos[0])+parseInt(newPos[2]+ pos[2])*sqrt])<1.25){
 						  
 						 modello.model.rotation.y = dir["yR"];
 						 //console.log(modello.model.rotation); 
@@ -1599,6 +1605,7 @@
 			
 		}
 		
+	
 		
 		Start();
 			
