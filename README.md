@@ -29,7 +29,7 @@ work and write a final report, as detailed below.
 ## Report
 
 Il progetto ripropone il gestore del mondo di populous semplificato in chiave voxel con alcune capacità divine, quali il
-terremoto, lo tzunami e la meteorite.
+terremoto, lo tzunami e la meteorite.  
 Vi è inoltre la presenza di un Camminatore Errante, immortale, e incapace di nuotare, difatto quando dovesse cadere in acqua profonda si 
 trasporterebbe magicamente da un altra parte.
 
