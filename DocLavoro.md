@@ -70,4 +70,7 @@
 	* 9/11/19:
 		correzione bug posizione meteora alla rotazione della mappa
 		correzione teletrasporto Camminatore Errante in caso di caduta in ac
-		
+	
+	* 10/11/19:
+		correzione bug posizione meteora al spostamento e rotazione durante la sua animazione
+		correzione limite scalino altezza Camminatore Errante	
