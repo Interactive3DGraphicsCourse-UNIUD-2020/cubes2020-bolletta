@@ -1030,13 +1030,18 @@
 				
 				var intervallo = setInterval(function(){
 						if(meteora.position.y<=pos.y){
+							var piEx = new THREE.Object3D();
 							timeEx = 0;
 							esplosionMesh.position.set(meteora.position.x+0.5, meteora.position.y+1.5, meteora.position.z+0.5);
-							scene.add(esplosionMesh);
+							esplosionMesh.rotation.y = -rotateA;
+							piEx.add(esplosionMesh);
+							piEx.position.set(-vista-0.5, 0,- vista-0.5)
+							piEx.rotation.y = rotateA;
+							scene.add(piEx);
 							var intervalloEsplosione=setInterval(function(){
 								if(timeEx>2.5){
 									clearInterval(intervalloEsplosione);
-									scene.remove(esplosionMesh);
+									scene.remove(piEx);
 									isRunningAction=false;
 									resetAllBTN();
 									resetCommand();
